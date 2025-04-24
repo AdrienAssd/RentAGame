@@ -1,9 +1,8 @@
 ---
 // Aucune donnée dynamique pour l'instant, que du statique pour l'exemple visuel
-const games = Array(12).fill({
-  title: "Title",
-  updated: "Updated today"
-});
+import GameCard from '../components/GameCard.astro';
+
+import { games } from '../data/games.js';
 
 const categories = ["A plusieurs", "Reflexion", "Solo", "Cartes", "Enfants"];
 const selectedCategory = "Reflexion";
@@ -55,21 +54,9 @@ const selectedCategory = "Reflexion";
         </div>
 
         <div class="grid grid-cols-5 gap-4">
-          <div class="bg-white rounded shadow p-2">
-            <img src="https://upload.wikimedia.org/wikipedia/en/5/5d/Monopoly_Box.jpg" alt="Monopoly" class="w-full h-32 object-cover rounded" />
-            <h2 class="text-sm font-bold mt-2">Monopoly...</h2>
-            <p class="text-xs text-gray-500">Updated today</p>
-          </div>
-
-          {games.map((game, index) => (
-            <div class="bg-white rounded shadow p-2" key={index}>
-              <div class="w-full h-32 bg-gray-200 rounded flex items-center justify-center">
-                <div class="text-gray-400 text-2xl">△ ◻︎ ◯</div>
-              </div>
-              <h2 class="text-sm font-bold mt-2">{game.title}</h2>
-              <p class="text-xs text-gray-500">{game.updated}</p>
-            </div>
-          ))}
+			{games.map((game) => (
+				<GameCard {...game} />
+			  ))}
         </div>
       </main>
     </div>

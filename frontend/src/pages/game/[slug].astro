@@ -1,0 +1,79 @@
+---
+// pages/game/[slug].astro
+import { games } from '../../data/games.js';
+export async function getStaticPaths() {
+  return games.map((game) => ({
+      params: { slug: game.slug }}))
+    }
+
+
+
+const { slug } = Astro.params;
+const game = games.find(g => g.slug === slug);
+
+if (!game) {
+  throw new Error('Jeu non trouvé');
+}
+---
+
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{slug} - RentAGame</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+      </head>
+      <body class="bg-purple-50 text-gray-800">
+        <header class="flex justify-between items-center p-4 shadow bg-white">
+          <div class="flex items-center gap-2">
+            <img src="/logo.svg" alt="Logo" class="h-10">
+            <h1 class="text-xl font-bold">{slug}</h1>
+          </div>
+          <nav class="space-x-4">
+            <a href="#" class="font-medium">{slug}</a>
+            <a href="#" class="text-gray-600 hover:text-black">À propos</a>
+            <a href="#" class="text-gray-600 hover:text-black">Contact</a>
+          </nav>
+        </header>
+    <br>
+    <section class="relative bg-white p-4 shadow-md">
+        <img src="/monopoly-banner.jpg" alt=`${slug} Banner` class="rounded-lg w-full h-64 object-cover">
+        <div class="absolute bottom-6 left-6 text-white">
+          <h1 class="text-4xl font-bold">{slug}</h1>
+          <p class="text-lg"></p>
+          <div class="mt-4 space-x-2">
+            <button class="bg-white text-gray-800 px-4 py-2 rounded font-semibold shadow">Ajouter à ma liste de souhaits</button>
+            <button class="bg-white text-gray-800 px-4 py-2 rounded font-semibold shadow">Disponible à l’emprunt</button>
+          </div>
+        </div>
+      </section>
+    
+      <!-- Tabs -->
+      <div class="flex justify-center mt-6">
+        <button class="bg-purple-100 text-purple-700 px-6 py-2 rounded-l-full font-semibold">Avis</button>
+        <button class="bg-white px-6 py-2 rounded-r-full border">Description</button>
+      </div>
+    
+      <!-- Reviews -->
+      <section class="p-6 space-y-4">
+        <div class="bg-white p-4 rounded shadow">
+          <h2 class="font-bold text-lg">Jeu formidable en famille !</h2>
+          <p class="text-sm text-gray-500">Category • $$ • 1.2 miles away</p>
+          <p class="text-sm text-gray-600 mt-2">Supporting line text lorem ipsum dolor sit amet, consectetur.</p>
+          <div class="flex items-center justify-between mt-2">
+            <div class="text-yellow-400">★★★★★</div>
+            <button>♡</button>
+          </div>
+        </div>
+        <div class="bg-white p-4 rounded shadow">
+          <h2 class="font-bold text-lg">Jeu légendaire !</h2>
+          <p class="text-sm text-gray-500">Category • $$ • 1.2 miles away</p>
+          <p class="text-sm text-gray-600 mt-2">Supporting line text lorem ipsum dolor sit amet, consectetur.</p>
+          <div class="flex items-center justify-between mt-2">
+            <div class="text-yellow-400">★★★★★</div>
+            <button>♡</button>
+          </div>
+        </div>
+      </section>
+  </body>
+</html>
