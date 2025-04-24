@@ -1,0 +1,25 @@
+---
+// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
+// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+---
+
+<html>
+	<head>
+    	<script>
+			async function fetchData() {
+				try {
+					const response = await fetch('http://localhost:3001/api/hello');
+					const data = await response.json();
+					document.getElementById('message').textContent = data.message;
+				} catch (error) {
+					console.error('Erreur lors de la récupération des données :', error);
+				}
+			}
+      		window.onload = fetchData;
+    	</script>
+  	</head>
+  	<body>
+    	<h1>Message du back-end :</h1>
+    	<p id="message">Chargement...</p>
+  	</body>
+</html>
