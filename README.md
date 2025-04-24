@@ -1,4 +1,4 @@
-# greenIT
+# Rent A Game
 git clone https://github.com/AdrienAssd/RentAGame
 cd RentAGame
 cd backend
