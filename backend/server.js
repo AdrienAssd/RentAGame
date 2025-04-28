@@ -4,6 +4,7 @@ const port = 3001;
 const cors = require('cors');
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/auth");
+const gameRoutes = require("./routes/games");
 require("dotenv").config();
 
 
@@ -14,6 +15,7 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api", authRoutes);
+app.use("/api", gameRoutes);
 
 app.listen(port, () => {
     console.log(`Serveur back-end en écoute sur http://localhost:${port}`);

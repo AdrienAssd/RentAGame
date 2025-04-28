@@ -52,8 +52,6 @@ exports.login = async (req, res) => {
 
     const user = rows[0];
 
-    console.log(user.email);
-
     // Vérification du mot de passe
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {

@@ -6,37 +6,48 @@
     <title>RentAGame</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   </head>
-	<script>
-		window.addEventListener('DOMContentLoaded', async () => {
-		  try {
-			const res = await fetch('http://localhost:3001/api/profile', {
-			  method: 'GET',
-			  credentials: 'include'
-			});
-			const data = await res.json();
-	  
-			const nav = document.querySelector('nav');
-			if (data.loggedIn) {
-			  // Si connecté, remplacer bouton connexion par icône profil
-			  const profileLink = document.createElement('a');
-			  profileLink.href = '/profil';
-			  profileLink.innerHTML = `
-				<img src="/images/profil-icon.png" alt="Profil" class="h-8 w-8 rounded-full object-cover" />
-			  `;
-			  profileLink.className = "inline-block"; // styling léger
-	  
-			  const loginButton = document.querySelector('a[href="/login"]');
-			  if (loginButton) {
-				loginButton.replaceWith(profileLink);
-			  }
-			}
-		  } catch (error) {
-			console.error('Erreur lors de la vérification du login', error);
-		  }
+
+  <body class="bg-purple-50 text-gray-800">
+    <script>
+	window.addEventListener('DOMContentLoaded', async () => {
+	const loginButton = document.getElementById('login-btn');
+	if (!loginButton) {
+		console.warn("Le bouton de connexion n'existe pas dans la page");
+		return;
+	}
+
+	try {
+		const res = await fetch('http://localhost:3001/api/profile', {
+		method: 'GET',
+		credentials: 'include'
 		});
-	  </script>
-	  
-	<body>
-		<slot />
-	</body>
+		if (!res.ok) {
+		console.error('Erreur API:', res.status);
+		return;
+		}
+
+		const data = await res.json();
+		console.log('Données profil reçues:', data);
+
+		if (data.loggedIn) {
+		const profileLink = document.createElement('a');
+		profileLink.href = '/profil';
+		profileLink.innerHTML = `
+			<img src="/images/profil-icon.png" alt="Profil" class="h-8 w-8 rounded-full object-cover" />
+		`;
+		profileLink.className = "inline-block";
+		loginButton.replaceWith(profileLink);
+		} else {
+		loginButton.classList.remove('hidden');
+		}
+
+	} catch (error) {
+		console.error('Erreur lors de la requête:', error);
+	}
+	});
+	</script>
+
+
+    <slot />
+  </body>
 </html>
