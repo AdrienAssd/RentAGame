@@ -1,0 +1,56 @@
+---
+---
+
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Inscription</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  </head>
+  <body class="bg-pink-50 min-h-screen flex flex-col">
+    <!-- HEADER -->
+    <header class="flex justify-between items-center p-4 shadow bg-white">
+      <div class="flex items-center gap-2">
+        <img src="/images/LogoRentAGame.png" alt="Logo" class="h-10" />
+        <h1 class="text-xl font-bold">Liste des jeux</h1>
+      </div>
+      <nav class="space-x-4">
+        <a href="/" class="font-medium">Liste des jeux</a>
+        <a href="#" class="text-gray-600 hover:text-black">À propos</a>
+        <a href="#" class="text-gray-600 hover:text-black">Contact</a>
+        <a href="/login" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Connexion</a>
+      </nav>
+    </header>
+
+    <!-- CONTENU -->
+    <main class="flex-1 flex items-center justify-center">
+      <div class="bg-white p-8 rounded shadow-md w-full max-w-sm mt-6">
+        <div class="flex justify-center mb-6">
+          <img src="/logo.svg" alt="Logo" class="h-10" />
+        </div>
+        <form>
+          <div class="mb-4">
+            <label for="email" class="block text-sm font-medium mb-1">Email</label>
+            <input id="email" type="email" placeholder="Email" class="w-full border rounded px-3 py-2" />
+          </div>
+          <div class="mb-4">
+            <label for="password" class="block text-sm font-medium mb-1">Mot de passe</label>
+            <input id="password" type="password" placeholder="Mot de passe" class="w-full border rounded px-3 py-2" />
+          </div>
+          <div class="mb-6 flex items-center space-x-2">
+            <input type="checkbox" id="newsletter" class="form-checkbox" checked />
+            <label for="newsletter" class="text-sm">Accepter inscription à notre newsletter</label>
+          </div>
+          <button type="submit" class="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition">
+            S'inscrire
+          </button>
+          <div class="mt-4 text-center">
+            <p class="text-sm text-black">Déjà un compte ?</p>
+            <a href="/login" class="text-sm text-black hover:underline">Se connecter</a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </body>
+</html>

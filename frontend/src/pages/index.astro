@@ -1,25 +1,65 @@
 ---
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Aucune donnée dynamique pour l'instant, que du statique pour l'exemple visuel
+import GameCard from '../components/GameCard.astro';
+
+import { games } from '../data/games.js';
+
+const categories = ["A plusieurs", "Reflexion", "Solo", "Cartes", "Enfants"];
+const selectedCategory = "Reflexion";
 ---
 
-<html>
-	<head>
-    	<script>
-			async function fetchData() {
-				try {
-					const response = await fetch('http://localhost:3001/api/hello');
-					const data = await response.json();
-					document.getElementById('message').textContent = data.message;
-				} catch (error) {
-					console.error('Erreur lors de la récupération des données :', error);
-				}
-			}
-      		window.onload = fetchData;
-    	</script>
-  	</head>
-  	<body>
-    	<h1>Message du back-end :</h1>
-    	<p id="message">Chargement...</p>
-  	</body>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Liste des jeux - RentAGame</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  </head>
+  <body class="bg-purple-50 text-gray-800">
+    <header class="flex justify-between items-center p-4 shadow bg-white">
+      <div class="flex items-center gap-2">
+        <img src="/images/LogoRentAGame.png" alt="Logo" class="h-10">
+        <h1 class="text-xl font-bold">Liste des jeux</h1>
+      </div>
+      <nav class="space-x-4">
+        <a href="/" class="font-medium">Liste des jeux</a>
+        <a href="#" class="text-gray-600 hover:text-black">À propos</a>
+        <a href="#" class="text-gray-600 hover:text-black">Contact</a>
+        <a href="/login" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Connexion</a>
+      </nav>
+    </header>
+
+    <div class="flex">
+      <aside class="w-48 bg-purple-100 p-4 flex flex-col gap-4">
+        <button class="bg-pink-200 text-2xl p-2 rounded-full">+</button>
+        <nav class="flex flex-col gap-2">
+          <a href="#" class="flex items-center gap-2 font-semibold text-purple-700">
+            <span class="material-icons">star</span> Liste de jeux
+          </a>
+          <a href="#" class="flex items-center gap-2 text-gray-600">
+            <span class="material-icons">star</span> À propos
+          </a>
+          <a href="#" class="flex items-center gap-2 text-gray-600">
+            <span class="material-icons">star</span> Nous contacter
+          </a>
+        </nav>
+      </aside>
+
+      <main class="flex-1 p-6">
+        <div class="flex gap-2 mb-4">
+          {categories.map(cat => (
+            <button class={`px-4 py-2 rounded-full border ${cat === selectedCategory ? 'bg-purple-200 text-purple-900 font-semibold' : 'bg-white text-gray-700'}`}>
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        <div class="grid grid-cols-5 gap-4">
+			{games.map((game) => (
+				<GameCard {...game} />
+			  ))}
+        </div>
+      </main>
+    </div>
+  </body>
 </html>
