@@ -7,7 +7,7 @@ const dbConfig = {
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'test', // <-- Mets le vrai nom ici
+  database: 'BDD_GreenIT', // <-- Mets le vrai nom ici
 };
 
 async function getConnection() {
@@ -20,7 +20,7 @@ exports.register = async (req, res) => {
     const db = await getConnection();
 
     // Vérifie si l'utilisateur existe déjà
-    const [rows] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+    const [rows] = await db.execute('SELECT * FROM utilisateur WHERE email = ?', [email]);
     if (rows.length > 0) {
       return res.status(400).json({ error: "User already exists" });
     }
@@ -29,7 +29,7 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Création de l'utilisateur
-    await db.execute('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword]);
+    await db.execute('INSERT INTO utilisateur (email, password) VALUES (?, ?)', [email, hashedPassword]);
 
     res.status(201).json({ message: "User created" });
   } catch (error) {
