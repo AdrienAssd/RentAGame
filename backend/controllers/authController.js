@@ -44,12 +44,15 @@ exports.login = async (req, res) => {
     const db = await getConnection();
 
     // Recherche de l'utilisateur
-    const [rows] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+    const [rows] = await db.execute('SELECT * FROM utilisateur WHERE email = ?', [email]);
     if (rows.length === 0) {
-      return res.status(401).json({ error: "Invalid mail or password" });
+        return res.status(401).json({ error: "Invalid mail or password" });
     }
 
+
     const user = rows[0];
+
+    console.log(user.email);
 
     // Vérification du mot de passe
     const isPasswordValid = await bcrypt.compare(password, user.password);
