@@ -1,40 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 ---
-
 <Layout>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-         try {
-             const logoutButton = document.getElementById('logoutButton');
-             if (logoutButton) {
-             logoutButton.addEventListener('click', async () => {
-                 try {
-                 const res = await fetch('http://localhost:3001/api/logout', {
-                     method: 'POST',
-                     credentials: 'include', // Assurez-vous que le cookie est envoyé avec la requête
-                 });
-
-                 const data = await res.json();
-                 if (data.message === 'Logged out') {
-                     // Redirection vers la page de connexion après déconnexion
-                     window.location.href = '/login';
-                 } else {
-                     console.error('Erreur lors de la déconnexion');
-                 }
-                 } catch (error) {
-                 console.error('Erreur lors de la déconnexion', error);
-                 }
-             });
-             } else {
-             console.error('Le bouton de déconnexion n\'a pas été trouvé.');
-             }
-         } catch (error) {
-             console.error('Erreur lors de l\'initialisation du bouton de déconnexion', error);
-         }
-         });
-
-       </script>
   <body class="bg-purple-50 text-gray-800">
     <header class="flex justify-between items-center p-4 shadow bg-white">
       <div class="flex items-center gap-2">
@@ -42,10 +9,10 @@ import Layout from '../layouts/Layout.astro';
         <h1 class="text-xl font-bold">Profil</h1>
       </div>
       <nav class="space-x-4">
-        <a href="/" class="font-medium">Liste des jeux</a>
+        <a href="/" class="text-gray-600 hover:text-black">Liste des jeux</a>
         <a href="#" class="text-gray-600 hover:text-black">À propos</a>
         <a href="#" class="text-gray-600 hover:text-black">Contact</a>
-        <a href="/login" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Connexion</a>
+        <a href="/login" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 hidden" id="login-btn">Connexion</a>
       </nav>
     </header>
 
@@ -70,7 +37,7 @@ import Layout from '../layouts/Layout.astro';
 
         <div class="bg-white p-6 rounded-lg shadow-lg">
           <p class="text-lg font-semibold mb-2">Email:</p>
-          <p class="text-gray-700 mb-4">user@example.com</p>
+          <p id="user-email" class="text-gray-700 mb-4">Chargement...</p>
 
           <button id="logoutButton" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500">
             Se déconnecter
@@ -78,5 +45,47 @@ import Layout from '../layouts/Layout.astro';
         </div>
       </main>
     </div>
+
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          // Charger l'email de l'utilisateur
+          const response = await fetch('http://localhost:3001/api/profile', {
+            credentials: 'include',
+          });
+          const user = await response.json();
+          const emailElement = document.getElementById('user-email');
+          
+          if (user.loggedIn && user.email) {
+            emailElement.textContent = user.email;
+          } else {
+            emailElement.textContent = 'Non connecté';
+          }
+
+          // Gérer la déconnexion
+          const logoutButton = document.getElementById('logoutButton');
+          if (logoutButton) {
+            logoutButton.addEventListener('click', async () => {
+              try {
+                const res = await fetch('http://localhost:3001/api/logout', {
+                  method: 'POST',
+                  credentials: 'include',
+                });
+                const data = await res.json();
+                if (data.message === 'Logged out') {
+                  window.location.href = '/login';
+                } else {
+                  console.error('Erreur lors de la déconnexion');
+                }
+              } catch (error) {
+                console.error('Erreur lors de la déconnexion', error);
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Erreur lors de la récupération du profil', error);
+        }
+      });
+    </script>
   </body>
 </Layout>

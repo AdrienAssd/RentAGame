@@ -1,17 +1,20 @@
 ---
-// Aucune donnée dynamique pour l'instant, que du statique pour l'exemple visuel
 import GameCard from '../components/GameCard.astro';
-
-import { games } from '../data/games.js';
+import Layout from '../layouts/Layout.astro';
 
 const categories = ["A plusieurs", "Reflexion", "Solo", "Cartes", "Enfants"];
 const selectedCategory = "Reflexion";
-import Layout from '../layouts/Layout.astro';
+
+// Appel API pour récupérer les jeux (avec pagination)
+const page = 1; // Vous pouvez ajuster la page ici si vous avez un mécanisme pour gérer cela
+const limit = 5; // Nombre de jeux par page
+const response = await fetch(`http://localhost:3001/api/games?page=${page}&limit=${limit}`, {
+  credentials: 'include',
+});
+const games = await response.json();
 ---
 
 <Layout>
-  
-  <body class="bg-purple-50 text-gray-800">
     <header class="flex justify-between items-center p-4 shadow bg-white">
       <div class="flex items-center gap-2">
         <img src="/images/LogoRentAGame.png" alt="Logo" class="h-10">
@@ -21,7 +24,7 @@ import Layout from '../layouts/Layout.astro';
         <a href="/" class="font-medium">Liste des jeux</a>
         <a href="#" class="text-gray-600 hover:text-black">À propos</a>
         <a href="#" class="text-gray-600 hover:text-black">Contact</a>
-        <a href="/login" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Connexion</a>
+        <a href="/login" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 hidden" id="login-btn">Connexion</a>
       </nav>
     </header>
 
@@ -50,12 +53,59 @@ import Layout from '../layouts/Layout.astro';
           ))}
         </div>
 
-        <div class="grid grid-cols-5 gap-4">
-			{games.map((game) => (
-				<GameCard {...game} />
-			  ))}
+        <div id="games-list" class="grid grid-cols-5 gap-4">
+          {games.map((game: any) => (
+            <GameCard 
+              key={game.slug}
+              title={game.title} 
+              image={game.image} 
+              slug={game.slug} 
+              minplayers={game.minplayers} 
+              maxplayers={game.maxplayers} 
+              price={game.price} 
+            />
+          ))}
         </div>
+
+        <button id="load-more" class="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+          Afficher plus
+        </button>
       </main>
     </div>
-  </body>
+
+    <script type="module">
+      let currentPage = 1;
+      const loadMoreButton = document.getElementById('load-more');
+      const gamesList = document.getElementById('games-list');
+
+      loadMoreButton.addEventListener('click', async () => {
+        currentPage++;
+        const response = await fetch(`http://localhost:3001/api/games?page=${currentPage}&limit=5`, { credentials: 'include' });
+        const newGames = await response.json();
+
+        newGames.forEach(game => {
+        // Rendre chaque jeu avec le HTML de GameCard
+        const gameCardHtml = `
+          <a href="/game/${game.slug}" class="game-card-link">
+            <article class="game-card">
+              <div class="bg-white rounded shadow p-2" id="${game.slug}">
+                <img src="${game.image}" alt="${game.title}" class="w-full h-32 object-cover rounded" />
+                <h2 class="text-sm font-bold mt-2">${game.title}</h2>
+                <p class="text-xs text-gray-500">${game.minplayers} - ${game.maxplayers} joueurs</p>
+                <p class="text-xs font-semibold mt-1">${game.price}</p>
+              </div>
+            </article>
+          </a>
+        `;
+        gamesList.innerHTML += gameCardHtml;
+      });
+
+
+        // Si il n'y a plus de jeux à afficher, désactiver le bouton
+        if (newGames.length < 5) {
+          loadMoreButton.disabled = true;
+          loadMoreButton.textContent = 'Tous les jeux sont affichés';
+        }
+      });
+    </script>
 </Layout>
