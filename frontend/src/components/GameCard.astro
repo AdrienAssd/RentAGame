@@ -1,0 +1,14 @@
+---
+// components/GameCard.astro
+const { title, date, image, slug } = Astro.props;
+---
+
+<a href={`/game/${slug}`} class="game-card-link">
+  <article class="game-card">
+    <div class="bg-white rounded shadow p-2" id={slug}>
+        <img src={image} alt={slug} class="w-full h-32 object-cover rounded" />
+        <h2 class="text-sm font-bold mt-2">{title}</h2>
+        <p class="text-xs text-gray-500">{date}</p>
+      </div>
+  </article>
+</a>
