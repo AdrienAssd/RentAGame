@@ -6,15 +6,11 @@ import { games } from '../data/games.js';
 
 const categories = ["A plusieurs", "Reflexion", "Solo", "Cartes", "Enfants"];
 const selectedCategory = "Reflexion";
+import Layout from '../layouts/Layout.astro';
 ---
 
-<html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Liste des jeux - RentAGame</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  </head>
+<Layout>
+  
   <body class="bg-purple-50 text-gray-800">
     <header class="flex justify-between items-center p-4 shadow bg-white">
       <div class="flex items-center gap-2">
@@ -62,4 +58,4 @@ const selectedCategory = "Reflexion";
       </main>
     </div>
   </body>
-</html>
+</Layout>
