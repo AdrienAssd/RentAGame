@@ -10,8 +10,8 @@ import Layout from '../layouts/Layout.astro';
       </div>
       <nav class="space-x-4">
         <a href="/" class="text-gray-600 hover:text-black">Liste des jeux</a>
-        <a href="#" class="text-gray-600 hover:text-black">À propos</a>
-        <a href="#" class="text-gray-600 hover:text-black">Contact</a>
+        <a href="/apropos" class="text-gray-600 hover:text-black">À propos</a>
+        <a href="/contact" class="text-gray-600 hover:text-black">Contact</a>
         <a href="/login" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 hidden" id="login-btn">Connexion</a>
       </nav>
     </header>
@@ -23,7 +23,7 @@ import Layout from '../layouts/Layout.astro';
           <a href="#" class="flex items-center gap-2 font-semibold text-purple-700">
             <span class="material-icons">star</span> Liste de jeux
           </a>
-          <a href="#" class="flex items-center gap-2 text-gray-600">
+          <a href="/apropos" class="flex items-center gap-2 text-gray-600">
             <span class="material-icons">star</span> À propos
           </a>
           <a href="#" class="flex items-center gap-2 text-gray-600">
@@ -36,11 +36,46 @@ import Layout from '../layouts/Layout.astro';
         <h2 class="text-2xl font-semibold mb-4">Bienvenue sur votre profil</h2>
 
         <div class="bg-white p-6 rounded-lg shadow-lg">
-          <p class="text-lg font-semibold mb-2">Email:</p>
+          <p class="text-lg font-semibold mb-2">Username :</p>
+          <p id="user-username" class="text-gray-700 mb-4">Chargement...</p>
+          <p class="text-lg font-semibold mb-2">Email :</p>
           <p id="user-email" class="text-gray-700 mb-4">Chargement...</p>
 
           <button id="logoutButton" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500">
             Se déconnecter
+          </button>
+
+          <!-- Nouveau bouton pour afficher le formulaire de modification -->
+          <button id="editProfileButton" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 mt-4">
+            Modifier le compte
+          </button>
+
+          <!-- Formulaire de modification du profil, caché par défaut -->
+          <div id="editProfileForm" class="mt-6 hidden">
+            <form id="profileForm" class="space-y-4">
+              <div>
+                <label for="newEmail" class="block text-sm">Nouvel email</label>
+                <input type="email" id="newEmail" class="w-full p-2 border border-gray-300 rounded-md" />
+              </div>
+              <div>
+                <label for="newUsername" class="block text-sm">Nom d'utilisateur</label>
+                <input type="text" id="newUsername" class="w-full p-2 border border-gray-300 rounded-md" />
+              </div>
+              <div>
+                <label for="oldPassword" class="block text-sm">Mot de passe actuel (si changement)</label>
+                <input type="password" id="oldPassword" class="w-full p-2 border border-gray-300 rounded-md" />
+              </div>
+              <div>
+                <label for="newPassword" class="block text-sm">Nouveau mot de passe</label>
+                <input type="password" id="newPassword" class="w-full p-2 border border-gray-300 rounded-md" />
+              </div>
+              <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">
+                Sauvegarder les modifications
+              </button>
+            </form>
+          </div>
+          <button id="deleteAccountButton" class="bg-red-700 text-white px-4 py-2 rounded mt-4 hover:bg-red-600">
+            Supprimer mon compte
           </button>
         </div>
       </main>
@@ -55,9 +90,11 @@ import Layout from '../layouts/Layout.astro';
           });
           const user = await response.json();
           const emailElement = document.getElementById('user-email');
+          const usernameElement = document.getElementById('user-username');
           
           if (user.loggedIn && user.email) {
             emailElement.textContent = user.email;
+            usernameElement.textContent = user.username || 'Non spécifié';
           } else {
             emailElement.textContent = 'Non connecté';
           }
@@ -82,6 +119,71 @@ import Layout from '../layouts/Layout.astro';
               }
             });
           }
+
+          // Afficher le formulaire de modification au clic
+          const editProfileButton = document.getElementById('editProfileButton');
+          const editProfileForm = document.getElementById('editProfileForm');
+          
+          if (editProfileButton) {
+            editProfileButton.addEventListener('click', () => {
+              editProfileForm.classList.toggle('hidden');
+            });
+          }
+
+          // Gérer la sauvegarde des modifications
+          const profileForm = document.getElementById('profileForm');
+          if (profileForm) {
+            profileForm.addEventListener('submit', async (e) => {
+              e.preventDefault();
+              const newEmail = document.getElementById('newEmail').value;
+              const newUsername = document.getElementById('newUsername').value;
+              const oldPassword = document.getElementById('oldPassword').value;
+              const newPassword = document.getElementById('newPassword').value;
+
+              const response = await fetch('http://localhost:3001/api/updateProfile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  newEmail,
+                  newUsername,
+                  oldPassword,
+                  newPassword,
+                }),
+                credentials: 'include',
+              });
+              const data = await response.json();
+              if (data.message === 'Profile updated') {
+                  alert('Profil mis à jour. Vous allez être déconnecté et devrez vous reconnecter.');
+                  window.location.href = '/login'; // Redirige vers la page de connexion
+              } else {
+                  alert(`Erreur lors de la mise à jour du profil : ${data.error || 'Erreur inconnue'}`);
+              }
+            });
+          }
+          const deleteAccountButton = document.getElementById('deleteAccountButton');
+          if (deleteAccountButton) {
+            deleteAccountButton.addEventListener('click', async () => {
+              const confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.");
+              if (confirmDelete) {
+                try {
+                  const res = await fetch('http://localhost:3001/api/deleteAccount', {
+                    method: 'DELETE',
+                    credentials: 'include',
+                  });
+                  const data = await res.json();
+                  if (data.message === 'Compte supprimé avec succès') {
+                    alert('Votre compte a été supprimé avec succès.');
+                    window.location.href = '/login'; // Redirige vers la page de connexion
+                  } else {
+                    alert('Erreur lors de la suppression du compte');
+                  }
+                } catch (error) {
+                  console.error('Erreur lors de la suppression du compte', error);
+                }
+              }
+            });
+          }
+
         } catch (error) {
           console.error('Erreur lors de la récupération du profil', error);
         }

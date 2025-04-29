@@ -1,5 +1,5 @@
 ---
-const { title, image, slug, minplayers, maxplayers } = Astro.props;
+const { title, image, slug, minplayers, maxplayers, minage } = Astro.props;
 ---
 
 <a href={`/game/${slug}`} class="game-card-link">
@@ -7,7 +7,10 @@ const { title, image, slug, minplayers, maxplayers } = Astro.props;
     <div class="bg-white rounded shadow p-2" id={slug}>
       <img src={image} alt={title} class="w-full h-32 object-cover rounded" loading="lazy"/>
       <h2 class="text-sm font-bold mt-2">{title}</h2>
-      <p class="text-xs text-gray-500">{minplayers} - {maxplayers} joueurs</p>
+      <div class="flex justify-between items-center text-xs text-gray-500">
+        <span>{minplayers} - {maxplayers} joueurs</span>
+        <span>{minage}+</span>
+      </div>
     </div>
   </article>
 </a>

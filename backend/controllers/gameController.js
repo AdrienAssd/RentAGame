@@ -28,12 +28,26 @@ module.exports.getGames = async (req, res) => {
       const offset = (page - 1) * limit; // Calculer l'offset
   
       // Récupérer les jeux en fonction de la pagination
-      const [details] = await db.execute('SELECT id, primary_key, minplayers, maxplayers FROM details LIMIT ? OFFSET ?', [limit, offset]);
+      const [details] = await db.execute('SELECT id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description  FROM details LIMIT ? OFFSET ?', [limit, offset]);
       const [ratings] = await db.execute('SELECT id, thumbnail FROM ratings');
-  
+      
+      
       // Vérification des données de ratings
   
       const games = details.map(detail => {
+        let categories = [];
+        try {
+          categories = JSON.parse(detail.boardgamecategory);  // Essaie de parser la chaîne en JSON
+          if (!Array.isArray(categories)) {
+            categories = [categories];  // Si ce n'est pas un tableau, le mettre dans un tableau
+          }
+        } catch (e) {
+          // Si le parsing échoue, traiter la chaîne comme avant
+          categories = detail.boardgamecategory
+            .replace(/[\[\]']/g, '')  // Retirer les crochets et les apostrophes
+            .split(',')
+            .map(cat => cat.trim());
+        }
         // Trouver le rating correspondant à chaque jeu en comparant les IDs
         const rating = ratings.find(r => r.id === detail.id);
   
@@ -43,6 +57,9 @@ module.exports.getGames = async (req, res) => {
           title: detail.primary_key,
           minplayers: detail.minplayers,
           maxplayers: detail.maxplayers,
+          description: detail.description,
+          minage: detail.minage,
+          boardgamecategory: detail.boardgamecategory,
           image: rating && rating.thumbnail ? getValidThumbnail(rating.thumbnail) : '/images/default-thumbnail.jpg',
           slug: detail.primary_key.toLowerCase().replace(/\s+/g, '-'),
         };
@@ -66,12 +83,25 @@ module.exports.getGames = async (req, res) => {
       // Récupérer les paramètres de pagination depuis la requête
   
       // Récupérer les jeux en fonction de la pagination
-      const [details] = await db.execute('SELECT id, primary_key, minplayers, maxplayers, description FROM details');
+      const [details] = await db.execute('SELECT id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description FROM details');
       const [ratings] = await db.execute('SELECT id, thumbnail FROM ratings');
   
       // Vérification des données de ratings
   
       const games = details.map(detail => {
+        let categories = [];
+        try {
+          categories = JSON.parse(detail.boardgamecategory);  // Essaie de parser la chaîne en JSON
+          if (!Array.isArray(categories)) {
+            categories = [categories];  // Si ce n'est pas un tableau, le mettre dans un tableau
+          }
+        } catch (e) {
+          // Si le parsing échoue, traiter la chaîne comme avant
+          categories = detail.boardgamecategory
+            .replace(/[\[\]']/g, '')  // Retirer les crochets et les apostrophes
+            .split(',')
+            .map(cat => cat.trim());
+        }
         // Trouver le rating correspondant à chaque jeu en comparant les IDs
         const rating = ratings.find(r => r.id === detail.id);
   
@@ -82,6 +112,8 @@ module.exports.getGames = async (req, res) => {
           minplayers: detail.minplayers,
           maxplayers: detail.maxplayers,
           description: detail.description,
+          minage: detail.minage,
+          boardgamecategory: detail.boardgamecategory,
           image: rating && rating.thumbnail ? getValidThumbnail(rating.thumbnail) : '/images/default-thumbnail.jpg',
           slug: detail.primary_key.toLowerCase().replace(/\s+/g, '-'),
         };
@@ -97,5 +129,48 @@ module.exports.getGames = async (req, res) => {
       res.status(500).json({ message: "Erreur lors de la récupération des jeux." });
     }
   };
+  
+  module.exports.getAllCategories = async (req, res) => {
+    try {
+      const db = await getConnection();
+  
+      const [rows] = await db.execute('SELECT boardgamecategory FROM details');
+      const categoriesSet = new Set();
+  
+      rows.forEach(row => {
+        let cats = [];
+  
+        try {
+          // Essayer de parser comme JSON (utile si c'est un vrai tableau JSON)
+          const parsed = JSON.parse(row.boardgamecategory);
+          if (Array.isArray(parsed)) {
+            cats = parsed;
+          } else {
+            cats = [parsed];
+          }
+        } catch (e) {
+          // Nettoyage manuel si le parsing échoue
+          const cleaned = row.boardgamecategory
+            .replace(/[\[\]']/g, '')  // retire [ ] et '
+            .split(',')
+            .map(cat => cat.trim());
+          cats = cleaned;
+        }
+  
+        cats.forEach(cat => {
+          if (cat && cat !== 'NA') {
+            categoriesSet.add(cat);
+          }
+        });
+      });
+  
+      await db.end();
+      res.json([...categoriesSet]);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Erreur lors de la récupération des catégories." });
+    }
+  };
+  
   
   

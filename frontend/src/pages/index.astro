@@ -1,219 +1,259 @@
 ---
 import GameCard from '../components/GameCard.astro';
 import Layout from '../layouts/Layout.astro';
-
-const categories = ["A plusieurs", "Reflexion", "Solo", "Cartes", "Enfants"];
-const selectedCategory = "Reflexion";
+// Récupération des catégories depuis l'API
+const categoriesResponse = await fetch("http://localhost:3001/api/categories");
+const categories = await categoriesResponse.json();
 
 // Appel API pour récupérer les jeux (avec pagination)
-const page = 1; // Vous pouvez ajuster la page ici si vous avez un mécanisme pour gérer cela
-const limit = 10; // Nombre de jeux par page
+const page = 1;
+const limit = 10;
 const response = await fetch(`http://localhost:3001/api/games?page=${page}&limit=${limit}`, {
   credentials: 'include',
 });
 const games = await response.json();
 ---
-
 <Layout>
-    <header class="flex justify-between items-center p-4 shadow bg-white">
-      <div class="flex items-center gap-2">
-        <img src="/images/LogoRentAGame.png" alt="Logo" class="h-10">
-        <h1 class="text-xl font-bold">Liste des jeux</h1>
-      </div>
-      <nav class="space-x-4">
-        <a href="/" class="font-medium">Liste des jeux</a>
-        <a href="#" class="text-gray-600 hover:text-black">À propos</a>
-        <a href="#" class="text-gray-600 hover:text-black">Contact</a>
-        <a href="/login" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 hidden" id="login-btn">Connexion</a>
-      </nav>
-    </header>
-
-    <div class="flex">
-      <aside class="w-48 bg-purple-100 p-4 flex flex-col gap-4">
-        <button class="bg-pink-200 text-2xl p-2 rounded-full">+</button>
-        <nav class="flex flex-col gap-2">
-          <a href="#" class="flex items-center gap-2 font-semibold text-purple-700">
-            <span class="material-icons">star</span> Liste de jeux
-          </a>
-          <a href="#" class="flex items-center gap-2 text-gray-600">
-            <span class="material-icons">star</span> À propos
-          </a>
-          <a href="#" class="flex items-center gap-2 text-gray-600">
-            <span class="material-icons">star</span> Nous contacter
-          </a>
-        </nav>
-      </aside>
-
-      <main class="flex-1 p-6">
-        <!-- Barre de recherche -->
-        <div class="mb-4 flex items-center gap-2">
-          <input 
-            type="text" 
-            id="search-input" 
-            placeholder="Rechercher un jeu..." 
-            class="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-400"
-          />
-          <button 
-            id="search-button" 
-            class="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700"
-            title="Rechercher"
-          >
-            🔍
-          </button>
-        </div>
-
-        <div class="flex gap-2 mb-4">
-          {categories.map(cat => (
-            <button class={`px-4 py-2 rounded-full border ${cat === selectedCategory ? 'bg-purple-200 text-purple-900 font-semibold' : 'bg-white text-gray-700'}`}>
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        <div id="games-list" class="grid grid-cols-5 gap-4">
-          {games.map((game: any) => (
-            <GameCard 
-              key={game.slug}
-              title={game.title} 
-              image={game.image} 
-              slug={game.slug} 
-              minplayers={game.minplayers} 
-              maxplayers={game.maxplayers} 
-              price={game.price} 
-            />
-          ))}
-        </div>
-
-        <button id="load-more" class="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
-          Afficher plus
-        </button>
-      </main>
+  <header class="flex justify-between items-center p-4 shadow bg-white">
+    <div class="flex items-center gap-2">
+      <img src="/images/LogoRentAGame.png" alt="Logo" class="h-10">
+      <h1 class="text-xl font-bold">Liste des jeux</h1>
     </div>
+    <nav class="space-x-4">
+      <a href="/" class="font-medium">Liste des jeux</a>
+      <a href="/apropos" class="text-gray-600 hover:text-black">À propos</a>
+      <a href="/contact" class="text-gray-600 hover:text-black">Contact</a>
+      <a href="/login" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 hidden" id="login-btn">Connexion</a>
+    </nav>
+  </header>
+  <div class="flex">
+    <aside class="w-48 bg-purple-100 p-4 flex flex-col gap-4">
+      <button class="bg-pink-200 text-2xl p-2 rounded-full">+</button>
+      <nav class="flex flex-col gap-2">
+        <a href="/" class="flex items-center gap-2 font-semibold text-purple-700">
+          <span class="material-icons">star</span> Liste de jeux
+        </a>
+        <a href="/apropos" class="flex items-center gap-2 text-gray-600">
+          <span class="material-icons">star</span> À propos
+        </a>
+        <a href="#" class="flex items-center gap-2 text-gray-600">
+          <span class="material-icons">star</span> Nous contacter
+        </a>
+      </nav>
+    </aside>
 
-    <script type="module">
-      let currentPage = 1;
-      let searchPage = 1;
-      const limit = 10;
-      let isSearchMode = false;
-      let searchResults = [];
-    
-      const loadMoreButton = document.getElementById('load-more');
-      const gamesList = document.getElementById('games-list');
-      const searchInput = document.getElementById('search-input');
-      const searchButton = document.getElementById('search-button');
-    
-      // Fonction pour générer HTML d'une carte jeu
-      function createGameCardHtml(game) {
-        return `
-          <a href="/game/${game.slug}" class="game-card-link">
-            <article class="game-card">
-              <div class="bg-white rounded shadow p-2" id="${game.slug}">
-                <img src="${game.image}" alt="${game.title}" class="w-full h-32 object-cover rounded" />
-                <h2 class="text-sm font-bold mt-2">${game.title}</h2>
-                <p class="text-xs text-gray-500">${game.minplayers} - ${game.maxplayers} joueurs</p>
+    <main class="flex-1 p-6">
+      <!-- Barre de recherche -->
+      <div class="mb-4 flex items-center gap-2">
+        <input 
+          type="text" 
+          id="search-input" 
+          placeholder="Rechercher un jeu..." 
+          class="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-400"
+        />
+        <button 
+          id="search-button" 
+          class="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700"
+          title="Rechercher"
+        >
+          🔍
+        </button>
+      </div>
+
+      <!-- Menu déroulant des catégories -->
+      <div class="mb-4">
+        <select id="category-select" class="px-4 py-2 border rounded">
+          <option value="">Toutes les catégories</option>
+          {categories.map((cat: any) => (
+            <option value={cat}>{cat}</option>
+          ))}
+        </select>
+      </div>
+
+      <div id="games-list" class="grid grid-cols-5 gap-4">
+        {games.map((game: any) => (
+          <GameCard 
+            key={game.slug}
+            title={game.title} 
+            image={game.image} 
+            slug={game.slug} 
+            minplayers={game.minplayers} 
+            maxplayers={game.maxplayers} 
+            minage={game.minage}
+            description={game.description}
+          />
+        ))}
+      </div>
+
+      <button id="load-more" class="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+        Afficher plus
+      </button>
+    </main>
+  </div>
+
+  <script type="module">
+    let currentPage = 1;
+    let searchPage = 1;
+    const limit = 10;
+    let isSearchMode = false;
+    let searchResults = [];
+  
+    const loadMoreButton = document.getElementById('load-more');
+    const gamesList = document.getElementById('games-list');
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-button');
+    const categorySelect = document.getElementById('category-select');
+  
+    // Fonction pour générer HTML d'une carte jeu
+    function createGameCardHtml(game) {
+      return `
+        <a href="/game/${game.slug}" class="game-card-link">
+          <article class="game-card">
+            <div class="bg-white rounded shadow p-2" id="${game.slug}">
+              <img src="${game.image}" alt="${game.title}" class="w-full h-32 object-cover rounded" />
+              <h2 class="text-sm font-bold mt-2">${game.title}</h2>
+              <div class="flex justify-between items-center text-xs text-gray-500">
+                <span>${game.minplayers} - ${game.maxplayers} joueurs</span>
+                <span>${game.minage}+</span>
               </div>
-            </article>
-          </a>
-        `;
-      }
-    
-      // Fonction d'affichage pour un tableau de jeux
-      function renderGames(games) {
-        games.forEach(game => {
-          gamesList.innerHTML += createGameCardHtml(game);
-        });
-      }
-    
-      // Chargement des jeux en pagination standard (API)
-      async function loadGamesPage(page) {
-        const response = await fetch(`http://localhost:3001/api/games?page=${page}&limit=${limit}`, { credentials: 'include' });
-        const newGames = await response.json();
-        renderGames(newGames);
-    
-        if (newGames.length < limit) {
-          loadMoreButton.disabled = true;
-          loadMoreButton.textContent = 'Tous les jeux sont affichés';
-        }
-      }
-    
-      // Chargement des résultats de recherche paginés localement
-      function loadSearchPage(page) {
-        const start = (page - 1) * limit;
-        const end = page * limit;
-        const pageResults = searchResults.slice(start, end);
-        renderGames(pageResults);
-    
-        if (end >= searchResults.length) {
-          loadMoreButton.disabled = true;
-          loadMoreButton.textContent = 'Tous les jeux sont affichés';
-        }
-      }
-    
-      // Gestion du bouton "Afficher plus"
-      loadMoreButton.addEventListener('click', async () => {
-        if (isSearchMode) {
-          searchPage++;
-          loadSearchPage(searchPage);
-        } else {
-          currentPage++;
-          await loadGamesPage(currentPage);
-        }
+            </div>
+          </article>
+        </a>
+      `;
+    }
+  
+    // Fonction d'affichage pour un tableau de jeux
+    function renderGames(games) {
+      games.forEach(game => {
+        gamesList.innerHTML += createGameCardHtml(game);
       });
-    
-      // Recherche des jeux
-      async function searchGames(query) {
-        const res = await fetch(`http://localhost:3001/api/allgames`, {
-          credentials: 'include',
-        });
-        const allGames = await res.json();
-    
-        searchResults = allGames.filter(game =>
-          game.title.toLowerCase().includes(query.toLowerCase())
-        );
-    
-        // Reset l'affichage
-        gamesList.innerHTML = '';
-        isSearchMode = true;
-        searchPage = 1;
-    
-        if (searchResults.length === 0) {
-          gamesList.innerHTML = `<p class="text-gray-500">Aucun jeu trouvé.</p>`;
-          loadMoreButton.style.display = 'none';
-        } else {
-          loadMoreButton.style.display = 'block';
-          loadMoreButton.disabled = false;
-          loadMoreButton.textContent = 'Afficher plus';
-          loadSearchPage(searchPage);
-        }
+    }
+  
+    // Chargement des jeux en pagination standard (API)
+    async function loadGamesPage(page) {
+      const response = await fetch(`http://localhost:3001/api/games?page=${page}&limit=${limit}`, { credentials: 'include' });
+      const newGames = await response.json();
+      renderGames(newGames);
+  
+      if (newGames.length < limit) {
+        loadMoreButton.disabled = true;
+        loadMoreButton.textContent = 'Tous les jeux sont affichés';
       }
-    
-      // Gestion clic sur loupe
-      searchButton.addEventListener('click', () => {
+    }
+  
+    // Chargement des résultats de recherche ou de filtrage paginés localement
+    function loadSearchPage(page) {
+      const start = (page - 1) * limit;
+      const end = page * limit;
+      const pageResults = searchResults.slice(start, end);
+      renderGames(pageResults);
+  
+      if (end >= searchResults.length) {
+        loadMoreButton.disabled = true;
+        loadMoreButton.textContent = 'Tous les jeux sont affichés';
+      }
+    }
+  
+    // Gestion du bouton "Afficher plus"
+    loadMoreButton.addEventListener('click', async () => {
+      if (isSearchMode) {
+        searchPage++;
+        loadSearchPage(searchPage);
+      } else {
+        currentPage++;
+        await loadGamesPage(currentPage);
+      }
+    });
+  
+    // Recherche des jeux par texte
+    async function searchGames(query) {
+      const res = await fetch(`http://localhost:3001/api/allgames`, {
+        credentials: 'include',
+      });
+      const allGames = await res.json();
+  
+      searchResults = allGames.filter(game =>
+        game.title.toLowerCase().includes(query.toLowerCase()) || game.description?.toLowerCase().includes(query.toLowerCase())
+      );
+  
+      // Reset affichage
+      gamesList.innerHTML = '';
+      isSearchMode = true;
+      searchPage = 1;
+  
+      if (searchResults.length === 0) {
+        gamesList.innerHTML = `<p class="text-gray-500">Aucun jeu trouvé.</p>`;
+        loadMoreButton.style.display = 'none';
+      } else {
+        loadMoreButton.style.display = 'block';
+        loadMoreButton.disabled = false;
+        loadMoreButton.textContent = 'Afficher plus';
+        loadSearchPage(searchPage);
+      }
+    }
+  
+    // Gestion clic sur la loupe (recherche)
+    searchButton.addEventListener('click', () => {
+      const query = searchInput.value.trim();
+      if (query !== '') {
+        searchGames(query);
+      } else {
+        location.reload(); // Recharge la page si le champ est vide
+      }
+    });
+  
+    // Gestion touche Entrée pour la recherche
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
         const query = searchInput.value.trim();
         if (query !== '') {
           searchGames(query);
         } else {
-            location.reload(); // Recharge la page si le champ est vide
+          location.reload(); // Recharge la page si le champ est vide
         }
-      });
-    
-      // Gestion touche Entrée
-      searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          const query = searchInput.value.trim();
-          if (query !== '') {
-            searchGames(query);
-          } else {
-            location.reload(); // Recharge la page si le champ est vide
-          }
-        }
-      });
-      // Si il n'y a plus de jeux à afficher, désactiver le bouton
-      if (newGames.length < 5) {
-          loadMoreButton.disabled = true;
-          loadMoreButton.textContent = 'Tous les jeux sont affichés';
-        }
-      // Chargement initial
-      loadGamesPage(currentPage);
-    </script>
+      }
+    });
+  
+    // Filtrage des jeux par catégorie via le dropdown
+    async function filterByCategory(category) {
+      const res = await fetch(`http://localhost:3001/api/allgames`);
+      const allGames = await res.json();
+  
+      // Ici, on filtre pour les jeux dont la description ou la propriété boardgamecategory contient la chaîne de la catégorie
+      const filtered = allGames.filter(game =>
+        game.description?.toLowerCase().includes(category.toLowerCase()) ||
+        game.boardgamecategory?.toLowerCase().includes(category.toLowerCase())
+      );
+  
+      // Reset affichage
+      gamesList.innerHTML = '';
+      isSearchMode = true;
+      searchResults = filtered;
+      searchPage = 1;
+  
+      if (filtered.length === 0) {
+        gamesList.innerHTML = `<p class="text-gray-500">Aucun jeu trouvé pour la catégorie sélectionnée.</p>`;
+        loadMoreButton.style.display = 'none';
+      } else {
+        loadMoreButton.style.display = 'block';
+        loadMoreButton.disabled = false;
+        loadMoreButton.textContent = 'Afficher plus';
+        loadSearchPage(searchPage);
+      }
+    }
+  
+    // Gestion du changement de sélection dans le dropdown
+    categorySelect.addEventListener('change', (e) => {
+      const selectedCat = e.target.value;
+      if (selectedCat === "") {
+        // Si "Toutes les catégories" est sélectionnée, recharger la page ou réinitialiser l'affichage
+        location.reload();
+      } else {
+        filterByCategory(selectedCat);
+      }
+    });
+  
+    // Remarque : Comme la page charge déjà 10 jeux via Astro, il n'est pas nécessaire de relancer loadGamesPage ici,
+    // sauf si tu souhaites rafraîchir ou paginer côté client.
+  </script>
 </Layout>

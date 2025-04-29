@@ -1,0 +1,56 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <header class="flex justify-between items-center p-4 shadow bg-white">
+    <div class="flex items-center gap-2">
+      <img src="/images/LogoRentAGame.png" alt="Logo" class="h-10">
+      <h1 class="text-xl font-bold">À propos</h1>
+    </div>
+    <nav class="space-x-4">
+      <a href="/" class="text-gray-600 hover:text-black">Liste des jeux</a>
+      <a href="/apropos" class="font-medium">À propos</a>
+      <a href="/contact" class="text-gray-600 hover:text-black">Contact</a>
+      <a href="/login" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 hidden" id="login-btn">Connexion</a>
+    </nav>
+  </header>
+
+  <main class="p-6">
+    <h2 class="text-2xl font-semibold mb-4">Rencontrez l'équipe de choc !</h2>
+    <p class="mb-4">Notre équipe est composée de passionnés travaillant ensemble pour créer un site de location de jeux de société. Découvrez les membres ci-dessous.</p>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <!-- Membres de l'équipe -->
+      <div class="text-center">
+        <img src="/images/team/member1.jpg" alt="Nom Membre 1" class="w-32 h-32 rounded-full mx-auto mb-2">
+        <h3 class="font-semibold">Adrien Assouad</h3>
+        <p>Développeur Frontend et Backend, mise en place de la BDD et deploiement du site</p>
+      </div>
+      
+      <div class="text-center">
+        <img src="/images/team/member2.jpg" alt="Nom Membre 2" class="w-32 h-32 rounded-full mx-auto mb-2">
+        <h3 class="font-semibold">Alexandre Munier</h3>
+        <p>Développeur Frontend et Backend, déploiement du site</p>
+      </div>
+      
+      <div class="text-center">
+        <img src="/images/team/member3.jpg" alt="Nom Membre 3" class="w-32 h-32 rounded-full mx-auto mb-2">
+        <h3 class="font-semibold">Thibault Bial</h3>
+        <p>Développeur Frontend, mise en place de la BDD</p>
+      </div>
+      
+      <div class="text-center">
+        <img src="/images/team/member4.jpg" alt="Nom Membre 4" class="w-32 h-32 rounded-full mx-auto mb-2">
+        <h3 class="font-semibold">Julien CHAN PENG</h3>
+        <p>Conception de la BDD, Développeur Frontend</p>
+      </div>
+      
+      <div class="text-center">
+        <img src="/images/team/member5.jpg" alt="Nom Membre 5" class="w-32 h-32 rounded-full mx-auto mb-2">
+        <h3 class="font-semibold">Catherine lyne Ngango koloko</h3>
+        <p>Conception de la BDD, déploiement du site</p>
+      </div>
+    </div>
+  </main>
+</Layout>

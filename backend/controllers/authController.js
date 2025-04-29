@@ -15,7 +15,7 @@ async function getConnection() {
 
 exports.register = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { username, email, password } = req.body;
     const db = await getConnection();
 
     // Vérifie si l'utilisateur existe déjà
@@ -28,7 +28,7 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Création de l'utilisateur
-    await db.execute('INSERT INTO utilisateur (email, password) VALUES (?, ?)', [email, hashedPassword]);
+    await db.execute('INSERT INTO utilisateur (username, email, password) VALUES (?, ?, ?)', [username, email, hashedPassword]);
 
     res.status(201).json({ message: "User created" });
   } catch (error) {
@@ -76,15 +76,77 @@ exports.logout = (req, res) => {
     res.json({ message: "Logged out" });
   };
 
-exports.getProfile = (req, res) => {
+exports.getProfile = async (req, res) => {
   const token = req.cookies.token;
   if (!token) return res.json({ loggedIn: false });
 
   try {
     const { email } = jwt.verify(token, process.env.JWT_SECRET);
-    res.json({ loggedIn: true, email });
+    const db = await getConnection();
+
+    // Vérifie si l'email actuel correspond à celui du token
+    const [userRows] = await db.execute('SELECT * FROM utilisateur WHERE email = ?', [email]);
+    const user = userRows[0];
+    if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    res.json({ loggedIn: true, email: user.email, username: user.username });
   } catch {
     res.clearCookie("token");
     res.json({ loggedIn: false });
+  }
+};
+// Route pour mettre à jour le profil
+exports.updateProfile = async (req, res) => {
+  const { newEmail, newUsername, oldPassword, newPassword } = req.body;
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ error: 'Utilisateur non connecté' });
+
+  try {
+    const { email } = jwt.verify(token, process.env.JWT_SECRET);
+    const db = await getConnection();
+
+    // Vérifie si l'email actuel correspond à celui du token
+    const [userRows] = await db.execute('SELECT * FROM utilisateur WHERE email = ?', [email]);
+    const user = userRows[0];
+    if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+
+    // Si un mot de passe est fourni, vérifie l'ancien mot de passe
+    if (oldPassword && newPassword) {
+      const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+      if (!isPasswordValid) return res.status(401).json({ error: 'Mot de passe actuel incorrect' });
+      
+      // Si un nouveau mot de passe est fourni, hash-le
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await db.execute('UPDATE utilisateur SET password = ? WHERE email = ?', [hashedPassword, email]);
+    }
+
+    // Mise à jour des autres informations (email, username)
+    if (newUsername) await db.execute('UPDATE utilisateur SET username = ? WHERE email = ?', [newUsername, email]);
+    if (newEmail && (newEmail !== email)) await db.execute('UPDATE utilisateur SET email = ? WHERE email = ?', [newEmail, email]);
+
+    res.json({ message: 'Profile updated' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+};
+
+// Route pour supprimer le compte
+exports.deleteAccount = async (req, res) => {
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ error: 'Non authentifié' });
+
+  try {
+    const { email: decodedEmail } = jwt.verify(token, process.env.JWT_SECRET);
+    const db = await getConnection();
+
+    // Suppression de l'utilisateur
+    await db.execute('DELETE FROM utilisateur WHERE email = ?', [decodedEmail]);
+
+    // Effacer le cookie et envoyer la réponse
+    res.clearCookie("token");
+    res.json({ success: true, message: 'Compte supprimé avec succès' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erreur serveur' });
   }
 };

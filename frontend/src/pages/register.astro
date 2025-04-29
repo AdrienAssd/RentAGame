@@ -16,16 +16,19 @@
           e.preventDefault();
           const emailInput = document.getElementById('email');
           const passwordInput = document.getElementById('password');
+          const usernameInput = document.getElementById('username');
   
-          if (emailInput instanceof HTMLInputElement && passwordInput instanceof HTMLInputElement) {
+          if (emailInput instanceof HTMLInputElement && passwordInput instanceof HTMLInputElement && usernameInput instanceof HTMLInputElement) {
+            // Vérification des champs vides
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
+            const username = usernameInput.value.trim();
   
             try {
               const res = await fetch('http://localhost:3001/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ username, email, password })
               });
   
               const data = await res.json();
@@ -65,9 +68,13 @@
     <main class="flex-1 flex items-center justify-center">
       <div class="bg-white p-8 rounded shadow-md w-full max-w-sm mt-6">
         <div class="flex justify-center mb-6">
-          <img src="/logo.svg" alt="Logo" class="h-10" />
+          <img src="/images/LogoRentAGame.png" alt="Logo" class="h-10" />
         </div>
         <form>
+          <div class="mb-4">
+            <label for="username" class="block text-sm font-medium mb-1">Username</label>
+            <input id="username" type="text" placeholder="Username" class="w-full border rounded px-3 py-2" />
+          </div>
           <div class="mb-4">
             <label for="email" class="block text-sm font-medium mb-1">Email</label>
             <input id="email" type="email" placeholder="Email" class="w-full border rounded px-3 py-2" />
