@@ -9,7 +9,6 @@ const dbConfig = {
   password: '',
   database: 'BDD_GreenIT', // <-- Mets le vrai nom ici
 };
-
 async function getConnection() {
   return await mysql.createConnection(dbConfig);
 }
