@@ -24,7 +24,7 @@ module.exports.getGames = async (req, res) => {
       const db = await getConnection();
   
       // Récupérer les paramètres de pagination depuis la requête
-      const { page = 1, limit = 5 } = req.query;
+      const { page = 1, limit = 10 } = req.query;
       const offset = (page - 1) * limit; // Calculer l'offset
   
       // Récupérer les jeux en fonction de la pagination
@@ -41,8 +41,8 @@ module.exports.getGames = async (req, res) => {
   
         return {
           title: detail.primary_key,
-          minPlayers: detail.minplayers,
-          maxPlayers: detail.maxplayers,
+          minplayers: detail.minplayers,
+          maxplayers: detail.maxplayers,
           image: rating && rating.thumbnail ? getValidThumbnail(rating.thumbnail) : '/images/default-thumbnail.jpg',
           slug: detail.primary_key.toLowerCase().replace(/\s+/g, '-'),
         };
@@ -79,8 +79,8 @@ module.exports.getGames = async (req, res) => {
   
         return {
           title: detail.primary_key,
-          minPlayers: detail.minplayers,
-          maxPlayers: detail.maxplayers,
+          minplayers: detail.minplayers,
+          maxplayers: detail.maxplayers,
           description: detail.description,
           image: rating && rating.thumbnail ? getValidThumbnail(rating.thumbnail) : '/images/default-thumbnail.jpg',
           slug: detail.primary_key.toLowerCase().replace(/\s+/g, '-'),
