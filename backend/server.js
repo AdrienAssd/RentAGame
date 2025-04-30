@@ -9,20 +9,22 @@ require("dotenv").config();
 
 
 const allowedOrigins = [
-  'http://localhost:3000',                     // dev local
-  'https://rent-a-game-lac.vercel.app',        // prod Astro
-  'https://rent-a-game-9782yzq1d-adrienassds-projects.vercel.app', // alias preview Vercel
+  'https://rent-a-game-lac.vercel.app', // site front déployé
+  'https://rent-a-game-9782yzq1d-adrienassds-projects.vercel.app', // alias Vercel preview
 ];
+
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    console.log("CORS Origin:", origin); // pour debug
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Origine non autorisée par CORS'), false);
+      callback(new Error('Origine non autorisée par CORS'));
     }
   },
-  credentials: true,
+  credentials: true, // essentiel pour que les cookies passent
 }));
+
 
 app.use(cookieParser());
 app.use(express.json());
