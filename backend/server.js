@@ -8,10 +8,13 @@ const gameRoutes = require("./routes/games");
 require("dotenv").config();
 
 
-app.use(cors({
-    origin: 'https://rent-a-game.vercel.app',
+app.use(
+  cors({
+    origin: "*", // TEMPORAIRE : à restreindre plus tard
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-  }));
+  })
+);
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api", authRoutes);
