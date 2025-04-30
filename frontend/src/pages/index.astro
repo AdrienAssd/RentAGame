@@ -77,181 +77,106 @@ const games = await response.json();
     </main>
   </div>
 
-  <script type="module">
-    let currentPage = 1;
-    let searchPage = 1;
-    const limit = 10;
-    let isSearchMode = false;
-    let searchResults = [];
+    <script type="module">
+    window.addEventListener('DOMContentLoaded', () => {
+      // — Variables DOM —
+      const loadMoreButton  = document.getElementById('load-more');
+      const gamesList       = document.getElementById('games-list');
+      const searchInput     = document.getElementById('search-input');
+      const searchButton    = document.getElementById('search-button');
+      const categorySelect  = document.getElementById('category-select');
   
-    const loadMoreButton = document.getElementById('load-more');
-    const gamesList = document.getElementById('games-list');
-    const searchInput = document.getElementById('search-input');
-    const searchButton = document.getElementById('search-button');
-    const categorySelect = document.getElementById('category-select');
+      console.log({ loadMoreButton, searchInput, searchButton, categorySelect });
   
-    // Fonction pour générer HTML d'une carte jeu
-    function createGameCardHtml(game) {
-      return `
-        <a href="/game/${game.slug}" class="game-card-link">
-          <article class="game-card">
-            <div class="bg-white rounded shadow p-2" id="${game.slug}">
-              <img src="${game.image}" alt="${game.title}" class="w-full h-32 object-cover rounded" />
-              <h2 class="text-sm font-bold mt-2">${game.title}</h2>
-              <div class="flex justify-between items-center text-xs text-gray-500">
-                <span>${game.minplayers} - ${game.maxplayers} joueurs</span>
-                <span>${game.minage}+</span>
+      // — État de pagination et filtre —
+      let currentPage     = 1;
+      let currentCategory = '';
+      const limit         = 10;
+  
+      // — Helpers HTML —
+      function createGameCardHtml(game) {
+        return `
+          <a href="/game/${game.slug}" class="game-card-link">
+            <article class="game-card">
+              <div class="bg-white rounded shadow p-2" id="${game.slug}">
+                <img src="${game.image}" alt="${game.title}" class="w-full h-32 object-cover rounded" loading="lazy" />
+                <h2 class="text-sm font-bold mt-2">${game.title}</h2>
+                <div class="flex justify-between items-center text-xs text-gray-500">
+                  <span>${game.minplayers} - ${game.maxplayers} joueurs</span>
+                  <span>${game.minage}+</span>
+                </div>
               </div>
-            </div>
-          </article>
-        </a>
-      `;
-    }
-  
-    // Fonction d'affichage pour un tableau de jeux
-    function renderGames(games) {
-      games.forEach(game => {
-        gamesList.innerHTML += createGameCardHtml(game);
-      });
-    }
-  
-    // Chargement des jeux en pagination standard (API)
-    async function loadGamesPage(page) {
-      const response = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/games?page=${page}&limit=${limit}`, { credentials: 'include' });
-      const newGames = await response.json();
-      renderGames(newGames);
-  
-      if (newGames.length < limit) {
-        loadMoreButton.disabled = true;
-        loadMoreButton.textContent = 'Tous les jeux sont affichés';
+            </article>
+          </a>
+        `;
       }
-    }
-  
-    // Chargement des résultats de recherche ou de filtrage paginés localement
-    function loadSearchPage(page) {
-      const start = (page - 1) * limit;
-      const end = page * limit;
-      const pageResults = searchResults.slice(start, end);
-      renderGames(pageResults);
-  
-      if (end >= searchResults.length) {
-        loadMoreButton.disabled = true;
-        loadMoreButton.textContent = 'Tous les jeux sont affichés';
+      function renderGames(games) {
+        gamesList.innerHTML += games.map(createGameCardHtml).join('');
       }
-    }
   
-    // Gestion du bouton "Afficher plus"
-    loadMoreButton.addEventListener('click', async () => {
-      if (isSearchMode) {
-        searchPage++;
-        loadSearchPage(searchPage);
-      } else {
-        currentPage++;
-        await loadGamesPage(currentPage);
-      }
-    });
-  
-    // Recherche des jeux par texte
-    async function searchGames(query) {
-      const res = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/allgames`, {
-        credentials: 'include',
-      });
-      const allGames = await res.json();
-  
-      searchResults = allGames.filter(game =>
-        game.title.toLowerCase().includes(query.toLowerCase()) || game.description?.toLowerCase().includes(query.toLowerCase())
-      );
-  
-      // Reset affichage
-      gamesList.innerHTML = '';
-      isSearchMode = true;
-      searchPage = 1;
-  
-      if (searchResults.length === 0) {
-        gamesList.innerHTML = `<p class="text-gray-500">Aucun jeu trouvé.</p>`;
-        loadMoreButton.style.display = 'none';
-      } else {
-        loadMoreButton.style.display = 'block';
-        loadMoreButton.disabled = false;
-        loadMoreButton.textContent = 'Afficher plus';
-        loadSearchPage(searchPage);
-      }
-    }
-  
-    // Gestion clic sur la loupe (recherche)
-    searchButton.addEventListener('click', () => {
-      const query = searchInput.value.trim();
-      if (query !== '') {
-        searchGames(query);
-      } else {
-        location.reload(); // Recharge la page si le champ est vide
-      }
-    });
-  
-    // Gestion touche Entrée pour la recherche
-    searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        const query = searchInput.value.trim();
-        if (query !== '') {
-          searchGames(query);
-        } else {
-          location.reload(); // Recharge la page si le champ est vide
+      // — Chargement des jeux (avec filtre catégorie) —
+      async function loadGamesPage(page) {
+        const catQuery = currentCategory
+          ? `&category=${encodeURIComponent(currentCategory)}`
+          : '';
+        console.log(`Chargement page ${page} (cat="${currentCategory}")`);
+        const res = await fetch(
+          `${import.meta.env.PUBLIC_BACKEND_URL}/api/games?page=${page}&limit=${limit}${catQuery}`,
+          { credentials: 'include' }
+        );
+        const newGames = await res.json();
+        console.log('Jeux reçus :', newGames);
+        renderGames(newGames);
+        if (newGames.length < limit) {
+          loadMoreButton.disabled   = true;
+          loadMoreButton.textContent = 'Tous les jeux sont affichés';
         }
       }
-    });
   
-    // Filtrage des jeux par catégorie via le dropdown
-    async function filterByCategory(category) {
-      const res = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/allgames`, {
-        credentials: 'include',
+      // — Bouton « Afficher plus » —
+      loadMoreButton.addEventListener('click', async () => {
+        currentPage++;
+        await loadGamesPage(currentPage);
       });
-      const allGames = await res.json();
-    
-      // Vérifie si la catégorie est incluse (si c’est un tableau ou une string)
-      const filtered = allGames.filter(game =>
-        (Array.isArray(game.boardgamecategory)
-          ? game.boardgamecategory.some(cat => cat.toLowerCase().includes(category.toLowerCase()))
-          : game.boardgamecategory?.toLowerCase().includes(category.toLowerCase()))
-      );
-    
-      // Réinitialisation de l’affichage
-      gamesList.innerHTML = '';
-      isSearchMode = true;
-      searchResults = filtered;
-      searchPage = 1;
-    
-      if (filtered.length === 0) {
-        gamesList.innerHTML = `<p class="text-gray-500">Aucun jeu trouvé pour la catégorie sélectionnée.</p>`;
-        loadMoreButton.style.display = 'none';
-      } else {
-        loadMoreButton.style.display = 'block';
-        loadMoreButton.disabled = false;
-        loadMoreButton.textContent = 'Afficher plus';
-        loadSearchPage(searchPage);
-      }
-    }
-
   
-    // Gestion du changement de sélection dans le dropdown
-    categorySelect.addEventListener('change', (e) => {
-      const selectedCat = e.target.value;
-      if (selectedCat === "") {
-        // Réinitialise à l'état de base
-        isSearchMode = false;
-        searchResults = [];
-        searchPage = 1;
+      // — Recherche textuelle —
+      async function searchGames(query) {
+        // Reset état
+        currentCategory = '';
         gamesList.innerHTML = '';
         currentPage = 1;
-        await loadGamesPage(currentPage);
+        // Ici tu pourrais appeler une route /api/search?query=…
+        // Pour l’exemple on recharge juste la page 1 de /api/games
+        await loadGamesPage(1);
+      }
+      searchButton.addEventListener('click', () => {
+        const q = searchInput.value.trim();
+        if (q) searchGames(q);
+      });
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const q = searchInput.value.trim();
+          if (q) searchGames(q);
+        }
+      });
+  
+      // — Filtrage par catégorie —
+      categorySelect.addEventListener('change', async (e) => {
+        const cat = e.target.value;
+        gamesList.innerHTML = '';
+        currentPage     = 1;
         loadMoreButton.disabled = false;
         loadMoreButton.textContent = 'Afficher plus';
-        loadMoreButton.style.display = 'block';
-      } else {
-        filterByCategory(selectedCat);
-      }
-    });
+        if (!cat) {
+          currentCategory = '';
+        } else {
+          currentCategory = cat;
+        }
+        await loadGamesPage(1);
+      });
   
-    // Remarque : Comme la page charge déjà 10 jeux via Astro, il n'est pas nécessaire de relancer loadGamesPage ici,
-    // sauf si tu souhaites rafraîchir ou paginer côté client.
+      // — Chargement initial —
+      loadGamesPage(1);
+    });
   </script>
 </Layout>
