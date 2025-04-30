@@ -70,7 +70,7 @@ import Layout from '../layouts/Layout.astro';
       document.addEventListener('DOMContentLoaded', async () => {
         try {
           // Charger l'email de l'utilisateur
-          const response = await fetch('http://localhost:3001/api/profile', {
+          const response = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/profile`, {
             credentials: 'include',
           });
           const user = await response.json();
@@ -89,7 +89,7 @@ import Layout from '../layouts/Layout.astro';
           if (logoutButton) {
             logoutButton.addEventListener('click', async () => {
               try {
-                const res = await fetch('http://localhost:3001/api/logout', {
+                const res = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/logout`, {
                   method: 'POST',
                   credentials: 'include',
                 });
@@ -125,7 +125,7 @@ import Layout from '../layouts/Layout.astro';
               const oldPassword = document.getElementById('oldPassword').value;
               const newPassword = document.getElementById('newPassword').value;
 
-              const response = await fetch('http://localhost:3001/api/updateProfile', {
+              const response = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/updateProfile`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -151,7 +151,7 @@ import Layout from '../layouts/Layout.astro';
               const confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.");
               if (confirmDelete) {
                 try {
-                  const res = await fetch('http://localhost:3001/api/deleteAccount', {
+                  const res = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/deleteAccount`, {
                     method: 'DELETE',
                     credentials: 'include',
                   });

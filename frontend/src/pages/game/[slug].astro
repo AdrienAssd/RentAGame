@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 
 export async function getStaticPaths() {
   // Va chercher tous les jeux pour générer les routes
-  const response = await fetch('http://localhost:3001/api/allgames', {
+  const response = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/allgames`, {
     credentials: 'include',
   });
   const games = await response.json();
@@ -16,7 +16,7 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 
 // Maintenant on cherche le jeu précis
-const response = await fetch('http://localhost:3001/api/allgames', {
+const response = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/allgames`, {
   credentials: 'include',
 });
 const games = await response.json();
@@ -33,7 +33,7 @@ let gameCategories = Array.isArray(game.boardgamecategory)
   ? game.boardgamecategory
   : JSON.parse(game.boardgamecategory.replace(/'/g, '"'));
 
-const responseFeedback = await fetch(`http://localhost:3001/api/getfeedback/${game.ID}`, {
+const responseFeedback = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/getfeedback/${game.ID}`, {
   credentials: 'include',
 });
 const feedbacks = await responseFeedback.json();
@@ -131,7 +131,7 @@ const feedbacks = await responseFeedback.json();
 
   <script is:inline>
     async function isUserAuthenticated() {
-      const res = await fetch('http://localhost:3001/api/profile', { method: 'GET', credentials: 'include' });
+      const res = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/profile`, { method: 'GET', credentials: 'include' });
       if (!res.ok) {
         console.error('Erreur lors de la vérification de la connexion');
         return false;
@@ -205,7 +205,7 @@ const feedbacks = await responseFeedback.json();
       const description = document.getElementById('description').value;
       const gameId = game.ID;
   
-      const response = await fetch('http://localhost:3001/api/addfeedback', {
+      const response = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/addfeedback`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ const feedbacks = await responseFeedback.json();
       if (response.ok) {
         alert('Avis soumis avec succès!');
         feedbackForm.reset();
-        const newFeedbacks = await fetch(`http://localhost:3001/api/getfeedback/${game.ID}`);
+        const newFeedbacks = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/getfeedback/${game.ID}`);
         const updatedFeedbacks = await newFeedbacks.json();
         displayFeedbacks(updatedFeedbacks);
       } else {

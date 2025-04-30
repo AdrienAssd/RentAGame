@@ -9,7 +9,7 @@ const dbConfig = {
 };
 
 async function getConnection() {
-  return await mysql.createConnection(dbConfig);
+  return await mysql.createConnection(process.env.DATABASE_URL || dbConfig);
 }
 function getValidThumbnail(thumbnail) {
     if (!thumbnail || thumbnail === 'NA' || !thumbnail.startsWith('http')) {

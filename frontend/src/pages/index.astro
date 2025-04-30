@@ -2,13 +2,13 @@
 import GameCard from '../components/GameCard.astro';
 import Layout from '../layouts/Layout.astro';
 // Récupération des catégories depuis l'API
-const categoriesResponse = await fetch("http://localhost:3001/api/categories");
+const categoriesResponse = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/categories`);
 const categories = await categoriesResponse.json();
 
 // Appel API pour récupérer les jeux (avec pagination)
 const page = 1;
 const limit = 10;
-const response = await fetch(`http://localhost:3001/api/games?page=${page}&limit=${limit}`, {
+const response = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/games?page=${page}&limit=${limit}`, {
   credentials: 'include',
 });
 const games = await response.json();
@@ -117,7 +117,7 @@ const games = await response.json();
   
     // Chargement des jeux en pagination standard (API)
     async function loadGamesPage(page) {
-      const response = await fetch(`http://localhost:3001/api/games?page=${page}&limit=${limit}`, { credentials: 'include' });
+      const response = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/games?page=${page}&limit=${limit}`, { credentials: 'include' });
       const newGames = await response.json();
       renderGames(newGames);
   
@@ -153,7 +153,7 @@ const games = await response.json();
   
     // Recherche des jeux par texte
     async function searchGames(query) {
-      const res = await fetch(`http://localhost:3001/api/allgames`, {
+      const res = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/allgames`, {
         credentials: 'include',
       });
       const allGames = await res.json();
@@ -202,7 +202,7 @@ const games = await response.json();
   
     // Filtrage des jeux par catégorie via le dropdown
     async function filterByCategory(category) {
-      const res = await fetch(`http://localhost:3001/api/allgames`);
+      const res = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/allgames`);
       const allGames = await res.json();
   
       // Ici, on filtre pour les jeux dont la description ou la propriété boardgamecategory contient la chaîne de la catégorie

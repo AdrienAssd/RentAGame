@@ -22,7 +22,7 @@
             const password = passwordInput.value.trim();
   
             try {
-              const res = await fetch('http://localhost:3001/api/login', {
+              const res = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include', // pour la session cookie
