@@ -221,10 +221,10 @@ module.exports.getGames = async (req, res) => {
   module.exports.getGameBySlug = async (req, res) => {
     const db = await getConnection();
 
-    const [details] = await db.execute('SELECT primary_key  FROM details');
+    const [details] = await db.execute('SELECT primary_key FROM details');
     const { slug } = req.params;
     // Recherche du jeu dans la base de données ou un fichier JSON
-    const game = détails.find(g => g.primary_key.toLowerCase().replace(/\s+/g, '-') === slug);
+    const game = details.find(g => g.primary_key.toLowerCase().replace(/\s+/g, '-') === slug);
     if (!game) {
       return res.status(404).json({ message: 'Jeu non trouvé' });
     }
