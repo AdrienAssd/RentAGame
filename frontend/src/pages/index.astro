@@ -1,6 +1,7 @@
 ---
 import GameCard from '../components/GameCard.astro';
 import Layout from '../layouts/Layout.astro';
+
 // Récupération des catégories depuis l'API
 const categoriesResponse = await fetch(`https://rentagame-production-81ca.up.railway.app/api/categories`);
 const categories = await categoriesResponse.json();
@@ -12,6 +13,7 @@ const response = await fetch(`https://rentagame-production-81ca.up.railway.app/a
   credentials: 'include',
 });
 const games = await response.json();
+
 ---
 <Layout>
   <header class="flex justify-between items-center p-4 shadow bg-white">
@@ -27,7 +29,6 @@ const games = await response.json();
     </nav>
   </header>
   <div class="flex">
-
     <main class="flex-1 p-6">
       <!-- Barre de recherche -->
       <div class="mb-4 flex items-center gap-2">
@@ -113,9 +114,14 @@ const games = await response.json();
         `;
       }
   
-      // Ajoute un tableau de jeux au DOM
+      // Réinitialise la liste de jeux uniquement lors de la recherche ou de l'application d'un filtre
+      function resetGameList() {
+        gamesList.innerHTML = ''; // Réinitialise la liste de jeux
+      }
+  
+      // Ajoute un tableau de jeux au DOM (ne nettoie pas la liste)
       function renderGames(games) {
-        gamesList.innerHTML += games.map(createGameCardHtml).join('');
+        gamesList.innerHTML += games.map(createGameCardHtml).join(''); // Ajoute les jeux sans supprimer les précédents
       }
   
       // Charge une page de jeux, en appliquant le filtre catégorie si présent
@@ -130,9 +136,9 @@ const games = await response.json();
         );
         const newGames = await res.json();
         console.log('Jeux reçus :', newGames);
-        renderGames(newGames);
+        renderGames(newGames); // Ajoute les jeux sans réinitialiser la liste
         if (newGames.length < limit) {
-          loadMoreButton.disabled   = true;
+          loadMoreButton.disabled = true;
           loadMoreButton.textContent = 'Tous les jeux sont affichés';
         }
       }
@@ -143,13 +149,13 @@ const games = await response.json();
         await loadGamesPage(currentPage);
       });
   
-      // Recherche textuelle (remplace par un appel API dédié si besoin)
+      // Recherche textuelle
       async function searchGames(query) {
         // Réinitialise filtre et liste
         currentCategory = '';
-        gamesList.innerHTML = '';
+        resetGameList();  // Réinitialise la liste de jeux avant la recherche
         currentPage = 1;
-        // Pour l'instant on recharge la page 1 de /api/games
+        // Recharge la page 1 de /api/games
         await loadGamesPage(1);
       }
       searchButton.addEventListener('click', () => {
@@ -167,7 +173,7 @@ const games = await response.json();
       categorySelect.addEventListener('change', async (e) => {
         const cat = e.target.value;
         // Réinitialise liste et pagination
-        gamesList.innerHTML = '';
+        resetGameList();  // Réinitialise la liste de jeux avant d'appliquer un filtre
         currentPage = 1;
         loadMoreButton.disabled = false;
         loadMoreButton.textContent = 'Afficher plus';
