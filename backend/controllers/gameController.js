@@ -40,19 +40,21 @@ module.exports.getGames = async (req, res) => {
     // Ajouter la pagination
     query += ' LIMIT ? OFFSET ?';
     
+    // Parse les paramètres de pagination en nombres entiers
     const limitInt = parseInt(limit, 10);
     const offsetInt = parseInt(offset, 10);
-    
-    // ⚠️ Vérifie que ce sont bien des nombres :
+
+    // Vérifie que les valeurs sont valides
     if (isNaN(limitInt) || isNaN(offsetInt)) {
       return res.status(400).json({ message: "Paramètres de pagination invalides." });
     }
-    
+
+    // Ajoute les paramètres à la requête
     queryParams.push(limitInt, offsetInt);
-    
-    // DEBUG
-    console.log("Query:", query);
-    console.log("Params:", queryParams);
+
+    // LOG des paramètres avant l'exécution de la requête
+    console.log("Exécution de la requête SQL : ", query);
+    console.log("Avec les paramètres : ", queryParams);
 
     // Exécution de la requête
     const [details] = await db.execute(query, queryParams);
@@ -97,7 +99,8 @@ module.exports.getGames = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la récupération des jeux." });
   }
 };
-  
+
+
   module.exports.getAllGames = async (req, res) => {
     try {
       const db = await getConnection();
