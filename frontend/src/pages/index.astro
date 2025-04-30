@@ -87,14 +87,11 @@ const games = await response.json();
       const searchButton    = document.getElementById('search-button');
       const categorySelect  = document.getElementById('category-select');
   
-      // Debug : assure-toi qu'on les récupère bien
-      console.log({ loadMoreButton, searchInput, searchButton, categorySelect });
-  
-      // État
       let currentPage     = 1;
       let currentCategory = '';
+      let searchQuery     = '';
       const limit         = 10;
-      let isLoading = false;  // État pour vérifier si une requête est en cours
+      let isLoading = false;
   
       // Génère le HTML d’une carte jeu
       function createGameCardHtml(game) {
@@ -116,38 +113,36 @@ const games = await response.json();
   
       // Ajoute un tableau de jeux au DOM (sans réinitialiser la liste existante)
       function renderGames(games) {
-        gamesList.innerHTML = games.map(createGameCardHtml).join(''); // Réinitialise et affiche les jeux
+        gamesList.innerHTML = games.map(createGameCardHtml).join('');
       }
 
       // Fonction de mise à jour des jeux sans duplication
       function appendGames(games) {
-        gamesList.innerHTML += games.map(createGameCardHtml).join(''); // Ajoute les nouveaux jeux au bas de la liste
+        gamesList.innerHTML += games.map(createGameCardHtml).join('');
       }
   
-      // Charge une page de jeux, en appliquant le filtre catégorie si présent
+      // Charge une page de jeux en fonction des filtres de recherche et catégorie
       async function loadGamesPage(page) {
-        if (isLoading) return;  // Empêche de charger une nouvelle page si déjà en cours
+        if (isLoading) return;
         isLoading = true;
-  
-        const catQuery = currentCategory
-          ? `&category=${encodeURIComponent(currentCategory)}`
-          : '';
-        console.log(`Chargement page ${page}, catégorie = "${currentCategory}"`);
+
+        const catQuery = currentCategory ? `&category=${encodeURIComponent(currentCategory)}` : '';
+        const searchQueryParam = searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : '';
   
         const res = await fetch(
-          `https://rentagame-production-81ca.up.railway.app/api/games?page=${page}&limit=${limit}${catQuery}`,
+          `https://rentagame-production-81ca.up.railway.app/api/games?page=${page}&limit=${limit}${catQuery}${searchQueryParam}`,
           { credentials: 'include' }
         );
         const newGames = await res.json();
         console.log('Jeux reçus :', newGames);
-  
+
         if (page === 1) {
           renderGames(newGames); // Affiche la première page
         } else {
-          appendGames(newGames); // Ajoute les jeux à la liste sans la réinitialiser
+          appendGames(newGames); // Ajoute les nouveaux jeux au bas de la liste
         }
-        isLoading = false; // Réinitialise l'état de chargement
-  
+        isLoading = false;
+
         if (newGames.length < limit) {
           loadMoreButton.disabled = true;
           loadMoreButton.textContent = 'Tous les jeux sont affichés';
@@ -159,40 +154,39 @@ const games = await response.json();
         currentPage++;
         await loadGamesPage(currentPage);
       });
-  
+
       // Recherche textuelle
       async function searchGames(query) {
-        // Réinitialise filtre et liste
         currentCategory = '';
         gamesList.innerHTML = '';  // Réinitialise la liste de jeux avant la recherche
+        searchQuery = query.trim();
         currentPage = 1;
-        // Recharge la page 1 de /api/games
-        await loadGamesPage(1);
+        await loadGamesPage(1); // Recharge la page 1 avec les résultats de la recherche
       }
+  
       searchButton.addEventListener('click', () => {
         const q = searchInput.value.trim();
-        if (q) searchGames(q);
+        if (q) searchGames(q);  // Recherche quand on clique sur le bouton
       });
+  
       searchInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           const q = searchInput.value.trim();
-          if (q) searchGames(q);
+          if (q) searchGames(q);  // Recherche quand on appuie sur Entrée
         }
       });
-  
+
       // Filtrage par catégorie
       categorySelect.addEventListener('change', async (e) => {
         const cat = e.target.value;
-        // Réinitialise liste et pagination
         gamesList.innerHTML = '';  // Réinitialise la liste de jeux avant d'appliquer un filtre
         currentPage = 1;
         loadMoreButton.disabled = false;
         loadMoreButton.textContent = 'Afficher plus';
-        // Applique ou retire le filtre
         currentCategory = cat || '';
         await loadGamesPage(1);
       });
-  
+
       // Chargement initial
       loadGamesPage(1);
     });
