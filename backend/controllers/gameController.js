@@ -223,8 +223,10 @@ module.exports.getGames = async (req, res) => {
 
     const [details] = await db.execute('SELECT primary_key FROM details');
     const { slug } = req.params;
+    console.log(slug); // Log pour vérifier le slug reçu
     // Recherche du jeu dans la base de données ou un fichier JSON
     const game = details.find(g => g.primary_key.toLowerCase().replace(/\s+/g, '-') === slug);
+    console.log(game);
     if (!game) {
       return res.status(404).json({ message: 'Jeu non trouvé' });
     }
