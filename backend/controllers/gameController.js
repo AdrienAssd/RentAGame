@@ -172,5 +172,49 @@ module.exports.getGames = async (req, res) => {
     }
   };
   
+  module.exports.getFeedbackByGameId = async (req, res) => {
+    const gameId = req.params.id; // Récupérer l'ID du jeu depuis les paramètres de la requête
+    try {
+      const db = await getConnection();
   
+      // Requête avec jointure entre feedback et users (supposons que la table des utilisateurs s'appelle `users`)
+      const [feedbacks] = await db.execute(
+        `SELECT feedback.*, utilisateur.username 
+         FROM feedback 
+         JOIN utilisateur ON feedback.user_ID = utilisateur.user_ID 
+         WHERE feedback.ID = ?`,
+        [gameId]
+      );
   
+      await db.end();
+  
+      res.json(feedbacks); // Retourner les feedbacks avec username
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Erreur lors de la récupération des feedbacks." });
+    }
+  };
+  
+  // POST /api/feedback
+  module.exports.addFeedback = async (req, res) => {
+    const { gameId, rating, description } = req.body;
+    const userId = req.session?.user?.ID; // Vérifie si l'utilisateur est connecté
+
+    if (!userId) {
+      return res.status(401).json({ message: "Utilisateur non authentifié" });
+    }
+
+    try {
+      const db = await getConnection();
+      await db.execute(
+        'INSERT INTO feedback (game_id, user_id, rating, description, date_fb) VALUES (?, ?, ?, ?, NOW())',
+        [gameId, userId, rating, description]
+      );
+      await db.end();
+      res.status(201).json({ message: "Feedback ajouté avec succès" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Erreur lors de l'ajout de l'avis" });
+    }
+  };
+
