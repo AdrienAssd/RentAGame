@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3000;
 const cors = require('cors');
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/auth");
@@ -18,5 +18,5 @@ app.use("/api", authRoutes);
 app.use("/api", gameRoutes);
 
 app.listen(port, () => {
-    console.log(`Serveur back-end en écoute sur http://localhost:${port}`);
+    console.log(`Serveur back-end en écoute sur ${port}`);
 });
