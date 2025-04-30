@@ -20,61 +20,70 @@ function getValidThumbnail(thumbnail) {
   
 
 module.exports.getGames = async (req, res) => {
-    try {
-      const db = await getConnection();
-  
-      // Récupérer les paramètres de pagination depuis la requête
-      const { page = 1, limit = 10 } = req.query;
-      const offset = (page - 1) * limit; // Calculer l'offset
-  
-      // Récupérer les jeux en fonction de la pagination
-      const [details] = await db.execute('SELECT id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description  FROM details LIMIT 10 OFFSET 0');
-      const [ratings] = await db.execute('SELECT id, thumbnail FROM ratings');
-      
-      
-      // Vérification des données de ratings
-  
-      const games = details.map(detail => {
-        let categories = [];
-        try {
-          categories = JSON.parse(detail.boardgamecategory);  // Essaie de parser la chaîne en JSON
-          if (!Array.isArray(categories)) {
-            categories = [categories];  // Si ce n'est pas un tableau, le mettre dans un tableau
-          }
-        } catch (e) {
-          // Si le parsing échoue, traiter la chaîne comme avant
-          categories = detail.boardgamecategory
-            .replace(/[\[\]']/g, '')  // Retirer les crochets et les apostrophes
-            .split(',')
-            .map(cat => cat.trim());
-        }
-        // Trouver le rating correspondant à chaque jeu en comparant les IDs
-        const rating = ratings.find(r => r.id === detail.id);
-  
-        // Log pour vérifier les valeurs récupérées
-  
-        return {
-          title: detail.primary_key,
-          minplayers: detail.minplayers,
-          maxplayers: detail.maxplayers,
-          description: detail.description,
-          minage: detail.minage,
-          boardgamecategory: detail.boardgamecategory,
-          image: rating && rating.thumbnail ? getValidThumbnail(rating.thumbnail) : '/images/default-thumbnail.jpg',
-          slug: detail.primary_key.toLowerCase().replace(/\s+/g, '-'),
-        };
-      });
-  
-      await db.end();
-  
-      // Log les jeux avant de les envoyer à la réponse
-  
-      res.json(games);  // Retourner seulement les jeux nécessaires
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Erreur lors de la récupération des jeux." });
+  try {
+    const db = await getConnection();
+
+    // Récupérer les paramètres de pagination et de catégorie depuis la requête
+    const { page = 1, limit = 10, category = '' } = req.query;  // 'category' est le paramètre de filtrage
+    const offset = (page - 1) * limit; // Calculer l'offset pour la pagination
+
+    // Requête de base
+    let query = 'SELECT id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description FROM details';
+    let queryParams = [];
+
+    // Si une catégorie est spécifiée, ajouter un filtre sur la catégorie
+    if (category) {
+      query += ' WHERE boardgamecategory LIKE ?';
+      queryParams.push(`%${category}%`);  // Utilisation de LIKE pour filtrer par catégorie
     }
-  };
+
+    // Ajouter la pagination
+    query += ' LIMIT ? OFFSET ?';
+    queryParams.push(limit, offset);
+
+    // Exécution de la requête
+    const [details] = await db.execute(query, queryParams);
+    const [ratings] = await db.execute('SELECT id, thumbnail FROM ratings');
+
+    // Traitement des jeux récupérés
+    const games = details.map(detail => {
+      let categories = [];
+      try {
+        categories = JSON.parse(detail.boardgamecategory);  // Essayer de parser comme JSON
+        if (!Array.isArray(categories)) {
+          categories = [categories];  // Si ce n'est pas un tableau, le mettre dans un tableau
+        }
+      } catch (e) {
+        // Si le parsing échoue, traiter la chaîne comme avant
+        categories = detail.boardgamecategory
+          .replace(/[\[\]']/g, '')  // Retirer les crochets et les apostrophes
+          .split(',')
+          .map(cat => cat.trim());
+      }
+
+      // Trouver le rating correspondant à chaque jeu
+      const rating = ratings.find(r => r.id === detail.id);
+
+      // Retourner les jeux avec toutes les données nécessaires
+      return {
+        title: detail.primary_key,
+        minplayers: detail.minplayers,
+        maxplayers: detail.maxplayers,
+        description: detail.description,
+        minage: detail.minage,
+        boardgamecategory: categories,
+        image: rating && rating.thumbnail ? getValidThumbnail(rating.thumbnail) : '/images/default-thumbnail.jpg',
+        slug: detail.primary_key.toLowerCase().replace(/\s+/g, '-'),
+      };
+    });
+
+    await db.end();
+    res.json(games); // Retourner les jeux filtrés
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur lors de la récupération des jeux." });
+  }
+};
   
   module.exports.getAllGames = async (req, res) => {
     try {
@@ -129,7 +138,8 @@ module.exports.getGames = async (req, res) => {
       res.status(500).json({ message: "Erreur lors de la récupération des jeux." });
     }
   };
-  
+
+
   module.exports.getAllCategories = async (req, res) => {
     try {
       const db = await getConnection();
