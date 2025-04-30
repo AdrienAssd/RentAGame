@@ -37,20 +37,14 @@ module.exports.getGames = async (req, res) => {
       queryParams.push(`%${category}%`);  // Utilisation de LIKE pour filtrer par catégorie
     }
 
-    // Ajouter la pagination
-    query += ' LIMIT ? OFFSET ?';
     
-    // Parse les paramètres de pagination en nombres entiers
-    const limitInt = parseInt(limit, 10);
-    const offsetInt = parseInt(offset, 10);
-
-    // Vérifie que les valeurs sont valides
+    // Nouvelle pagination : on injecte directement les valeurs numériques
+    const limitInt  = parseInt(limit, 10);
+    const offsetInt = parseInt((page - 1) * limitInt, 10);
     if (isNaN(limitInt) || isNaN(offsetInt)) {
-      return res.status(400).json({ message: "Paramètres de pagination invalides." });
+      return res.status(400).json({ message: 'Paramètres de pagination invalides.' });
     }
-
-    // Ajoute les paramètres à la requête
-    queryParams.push(limitInt, offsetInt);
+    query += ` LIMIT ${limitInt} OFFSET ${offsetInt}`;
 
     // LOG des paramètres avant l'exécution de la requête
     console.log("Exécution de la requête SQL : ", query);
