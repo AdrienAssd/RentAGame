@@ -77,23 +77,24 @@ const games = await response.json();
     </main>
   </div>
 
-    <script type="module">
+  <script type="module">
     window.addEventListener('DOMContentLoaded', () => {
-      // — Variables DOM —
+      // Références DOM
       const loadMoreButton  = document.getElementById('load-more');
       const gamesList       = document.getElementById('games-list');
       const searchInput     = document.getElementById('search-input');
       const searchButton    = document.getElementById('search-button');
       const categorySelect  = document.getElementById('category-select');
   
+      // Debug : assure-toi qu'on les récupère bien
       console.log({ loadMoreButton, searchInput, searchButton, categorySelect });
   
-      // — État de pagination et filtre —
+      // État
       let currentPage     = 1;
       let currentCategory = '';
       const limit         = 10;
   
-      // — Helpers HTML —
+      // Génère le HTML d’une carte jeu
       function createGameCardHtml(game) {
         return `
           <a href="/game/${game.slug}" class="game-card-link">
@@ -110,16 +111,18 @@ const games = await response.json();
           </a>
         `;
       }
+  
+      // Ajoute un tableau de jeux au DOM
       function renderGames(games) {
         gamesList.innerHTML += games.map(createGameCardHtml).join('');
       }
   
-      // — Chargement des jeux (avec filtre catégorie) —
+      // Charge une page de jeux, en appliquant le filtre catégorie si présent
       async function loadGamesPage(page) {
         const catQuery = currentCategory
           ? `&category=${encodeURIComponent(currentCategory)}`
           : '';
-        console.log(`Chargement page ${page} (cat="${currentCategory}")`);
+        console.log(`Chargement page ${page}, catégorie = "${currentCategory}"`);
         const res = await fetch(
           `${import.meta.env.PUBLIC_BACKEND_URL}/api/games?page=${page}&limit=${limit}${catQuery}`,
           { credentials: 'include' }
@@ -133,20 +136,19 @@ const games = await response.json();
         }
       }
   
-      // — Bouton « Afficher plus » —
+      // Afficher la page suivante au clic
       loadMoreButton.addEventListener('click', async () => {
         currentPage++;
         await loadGamesPage(currentPage);
       });
   
-      // — Recherche textuelle —
+      // Recherche textuelle (remplace par un appel API dédié si besoin)
       async function searchGames(query) {
-        // Reset état
+        // Réinitialise filtre et liste
         currentCategory = '';
         gamesList.innerHTML = '';
         currentPage = 1;
-        // Ici tu pourrais appeler une route /api/search?query=…
-        // Pour l’exemple on recharge juste la page 1 de /api/games
+        // Pour l'instant on recharge la page 1 de /api/games
         await loadGamesPage(1);
       }
       searchButton.addEventListener('click', () => {
@@ -160,22 +162,20 @@ const games = await response.json();
         }
       });
   
-      // — Filtrage par catégorie —
+      // Filtrage par catégorie
       categorySelect.addEventListener('change', async (e) => {
         const cat = e.target.value;
+        // Réinitialise liste et pagination
         gamesList.innerHTML = '';
-        currentPage     = 1;
+        currentPage = 1;
         loadMoreButton.disabled = false;
         loadMoreButton.textContent = 'Afficher plus';
-        if (!cat) {
-          currentCategory = '';
-        } else {
-          currentCategory = cat;
-        }
+        // Applique ou retire le filtre
+        currentCategory = cat || '';
         await loadGamesPage(1);
       });
   
-      // — Chargement initial —
+      // Chargement initial
       loadGamesPage(1);
     });
   </script>
