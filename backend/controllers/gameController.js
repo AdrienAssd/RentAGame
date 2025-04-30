@@ -219,16 +219,52 @@ module.exports.getGames = async (req, res) => {
   };
 
   module.exports.getGameBySlug = async (req, res) => {
-    const db = await getConnection();
-
-    const [details] = await db.execute('SELECT primary_key FROM details');
-    const { slug } = req.params;
-    console.log(slug); // Log pour vérifier le slug reçu
-    // Recherche du jeu dans la base de données ou un fichier JSON
-    const game = details.find(g => g.primary_key.toLowerCase().replace(/\s+/g, '-') === slug);
-    console.log(game);
-    if (!game) {
+  const db = await getConnection();
+  const { slug } = req.params;
+  
+  try {
+    // Recherche du jeu dans la base de données
+    const [details] = await db.execute('SELECT * FROM details WHERE primary_key = ?', [slug.replace(/-/g, ' ').toUpperCase()]);
+    
+    // Si aucun jeu n'est trouvé
+    if (details.length === 0) {
       return res.status(404).json({ message: 'Jeu non trouvé' });
     }
-    res.json(game);
-  };
+    
+    // Récupérer les informations du jeu et les ratings associés
+    const game = details[0];
+    const [ratings] = await db.execute('SELECT thumbnail FROM ratings WHERE id = ?', [game.id]);
+    
+    // Vérification et ajout des catégories
+    let categories = [];
+    try {
+      categories = JSON.parse(game.boardgamecategory); // Essayer de parser en JSON
+      if (!Array.isArray(categories)) {
+        categories = [categories]; // Si ce n'est pas un tableau, le mettre dans un tableau
+      }
+    } catch (e) {
+      // Si le parsing échoue, traiter la chaîne comme avant
+      categories = game.boardgamecategory
+        .replace(/[\[\]']/g, '')  // Retirer les crochets et les apostrophes
+        .split(',')
+        .map(cat => cat.trim());
+    }
+
+    // Retourner les informations complètes du jeu avec son image
+    const rating = ratings.length > 0 ? ratings[0] : null;
+    res.json({
+      title: game.primary_key,
+      description: game.description,
+      minplayers: game.minplayers,
+      maxplayers: game.maxplayers,
+      minage: game.minage,
+      boardgamecategory: categories,
+      image: rating ? getValidThumbnail(rating.thumbnail) : '/images/default-thumbnail.jpg',
+      slug: game.primary_key.toLowerCase().replace(/\s+/g, '-'),
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Erreur lors de la récupération du jeu.' });
+  }
+};
