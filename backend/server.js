@@ -10,8 +10,7 @@ require("dotenv").config();
 
 app.use(
   cors({
-    origin: "*", // TEMPORAIRE : à restreindre plus tard
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "https://rent-a-game-lac.vercel.app",
     credentials: true,
   })
 );
