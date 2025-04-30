@@ -38,10 +38,21 @@ module.exports.getGames = async (req, res) => {
     }
 
     // Ajouter la pagination
-    const limitInt = parseInt(limit);
-    const offsetInt = parseInt(offset);
     query += ' LIMIT ? OFFSET ?';
-    queryParams.push(limit, offset);
+    
+    const limitInt = parseInt(limit, 10);
+    const offsetInt = parseInt(offset, 10);
+    
+    // ⚠️ Vérifie que ce sont bien des nombres :
+    if (isNaN(limitInt) || isNaN(offsetInt)) {
+      return res.status(400).json({ message: "Paramètres de pagination invalides." });
+    }
+    
+    queryParams.push(limitInt, offsetInt);
+    
+    // DEBUG
+    console.log("Query:", query);
+    console.log("Params:", queryParams);
 
     // Exécution de la requête
     const [details] = await db.execute(query, queryParams);
