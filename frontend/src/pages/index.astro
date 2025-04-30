@@ -1,6 +1,8 @@
 ---
 import GameCard from '../components/GameCard.astro';
 import Layout from '../layouts/Layout.astro';
+
+const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL;
 // Récupération des catégories depuis l'API
 const categoriesResponse = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/categories`);
 const categories = await categoriesResponse.json();
@@ -8,7 +10,7 @@ const categories = await categoriesResponse.json();
 // Appel API pour récupérer les jeux (avec pagination)
 const page = 1;
 const limit = 10;
-const response = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/games?page=${page}&limit=${limit}`, {
+const response = await fetch(`${BACKEND_URL}/api/games?page=${page}&limit=${limit}`, {
   credentials: 'include',
 });
 const games = await response.json();
@@ -125,7 +127,7 @@ const games = await response.json();
           : '';
         console.log(`Chargement page ${page}, catégorie = "${currentCategory}"`);
         const res = await fetch(
-          `${import.meta.env.PUBLIC_BACKEND_URL}/api/games?page=${page}&limit=${limit}${catQuery}`,
+          `${BACKEND_URL}/api/games?page=${page}&limit=${limit}${catQuery}`,
           { credentials: 'include' }
         );
         const newGames = await res.json();
