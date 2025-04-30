@@ -202,21 +202,24 @@ const games = await response.json();
   
     // Filtrage des jeux par catégorie via le dropdown
     async function filterByCategory(category) {
-      const res = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/allgames`);
+      const res = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/allgames`, {
+        credentials: 'include',
+      });
       const allGames = await res.json();
-  
-      // Ici, on filtre pour les jeux dont la description ou la propriété boardgamecategory contient la chaîne de la catégorie
+    
+      // Vérifie si la catégorie est incluse (si c’est un tableau ou une string)
       const filtered = allGames.filter(game =>
-        game.description?.toLowerCase().includes(category.toLowerCase()) ||
-        game.boardgamecategory?.toLowerCase().includes(category.toLowerCase())
+        (Array.isArray(game.boardgamecategory)
+          ? game.boardgamecategory.some(cat => cat.toLowerCase().includes(category.toLowerCase()))
+          : game.boardgamecategory?.toLowerCase().includes(category.toLowerCase()))
       );
-  
-      // Reset affichage
+    
+      // Réinitialisation de l’affichage
       gamesList.innerHTML = '';
       isSearchMode = true;
       searchResults = filtered;
       searchPage = 1;
-  
+    
       if (filtered.length === 0) {
         gamesList.innerHTML = `<p class="text-gray-500">Aucun jeu trouvé pour la catégorie sélectionnée.</p>`;
         loadMoreButton.style.display = 'none';
@@ -227,13 +230,22 @@ const games = await response.json();
         loadSearchPage(searchPage);
       }
     }
+
   
     // Gestion du changement de sélection dans le dropdown
     categorySelect.addEventListener('change', (e) => {
       const selectedCat = e.target.value;
       if (selectedCat === "") {
-        // Si "Toutes les catégories" est sélectionnée, recharger la page ou réinitialiser l'affichage
-        location.reload();
+        // Réinitialise à l'état de base
+        isSearchMode = false;
+        searchResults = [];
+        searchPage = 1;
+        gamesList.innerHTML = '';
+        currentPage = 1;
+        await loadGamesPage(currentPage);
+        loadMoreButton.disabled = false;
+        loadMoreButton.textContent = 'Afficher plus';
+        loadMoreButton.style.display = 'block';
       } else {
         filterByCategory(selectedCat);
       }
