@@ -28,7 +28,7 @@ module.exports.getGames = async (req, res) => {
       const offset = (page - 1) * limit; // Calculer l'offset
   
       // Récupérer les jeux en fonction de la pagination
-      const [details] = await db.execute('SELECT id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description  FROM details LIMIT ? OFFSET ?', [limit, offset]);
+      const [details] = await db.execute('SELECT id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description  FROM details LIMIT 10 OFFSET 0');
       const [ratings] = await db.execute('SELECT id, thumbnail FROM ratings');
       
       
