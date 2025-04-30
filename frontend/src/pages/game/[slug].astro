@@ -9,7 +9,7 @@ console.log(slug);
 let game = null;
 
 if (slug) {
-  const res = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/game/${slug}`);  // Utilisez l'API pour récupérer un jeu spécifique
+  const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/game/${slug}`);  // Utilisez l'API pour récupérer un jeu spécifique
   if (res.ok) {
     game = await res.json();  // Récupérer le jeu directement par son slug
   }
@@ -25,7 +25,7 @@ let gameCategories = Array.isArray(game.boardgamecategory)
   ? game.boardgamecategory
   : JSON.parse(game.boardgamecategory.replace(/'/g, '"'));
 
-const responseFeedback = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/getfeedback/${game.ID}`, {
+const responseFeedback = await fetch(`https://rentagame-production-81ca.up.railway.app/api/getfeedback/${game.ID}`, {
   credentials: 'include',
 });
 const feedbacks = await responseFeedback.json();
@@ -122,7 +122,7 @@ const feedbacks = await responseFeedback.json();
 
   <script is:inline>
     async function isUserAuthenticated() {
-      const res = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/profile`, { method: 'GET', credentials: 'include' });
+      const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/profile`, { method: 'GET', credentials: 'include' });
       if (!res.ok) {
         console.error('Erreur lors de la vérification de la connexion');
         return false;
@@ -196,7 +196,7 @@ const feedbacks = await responseFeedback.json();
       const description = document.getElementById('description').value;
       const gameId = game.ID;
   
-      const response = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/addfeedback`, {
+      const response = await fetch(`https://rentagame-production-81ca.up.railway.app/api/addfeedback`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -211,7 +211,7 @@ const feedbacks = await responseFeedback.json();
       if (response.ok) {
         alert('Avis soumis avec succès!');
         feedbackForm.reset();
-        const newFeedbacks = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/getfeedback/${game.ID}`);
+        const newFeedbacks = await fetch(`https://rentagame-production-81ca.up.railway.app/api/getfeedback/${game.ID}`);
         const updatedFeedbacks = await newFeedbacks.json();
         displayFeedbacks(updatedFeedbacks);
       } else {
