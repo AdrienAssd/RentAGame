@@ -8,12 +8,22 @@ const gameRoutes = require("./routes/games");
 require("dotenv").config();
 
 
-app.use(
-  cors({
-    origin: "https://rent-a-game-lac.vercel.app",
-    credentials: true,
-  })
-);
+const allowedOrigins = [
+  'http://localhost:3000',                     // dev local
+  'https://rent-a-game-lac.vercel.app',        // prod Astro
+  'https://rent-a-game-9782yzq1d-adrienassds-projects.vercel.app', // alias preview Vercel
+];
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Origine non autorisée par CORS'), false);
+    }
+  },
+  credentials: true,
+}));
+
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api", authRoutes);
