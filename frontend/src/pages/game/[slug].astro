@@ -1,34 +1,25 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-
-export async function getStaticPaths() {
-  // Va chercher tous les jeux pour générer les routes
-  const response = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/allgames`, {
-    credentials: 'include',
-  });
-  const games = await response.json();
-
-  return games.map((game: any) => ({
-    params: { slug: game.slug },
-  }));
-}
+import type { AstroGlobal } from 'astro';
 
 const { slug } = Astro.params;
 
-// Maintenant on cherche le jeu précis
-const response = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/allgames`, {
-  credentials: 'include',
-});
-const games = await response.json();
+// Fetch dynamique des données
+let game = null;
 
-const game = games.find((g: any) => g.slug === slug);
-
-if (!game) {
-  throw new Error('Jeu non trouvé');
+if (slug) {
+  const res = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/game/${slug}`);  // Utilisez l'API pour récupérer un jeu spécifique
+  if (res.ok) {
+    game = await res.json();  // Récupérer le jeu directement par son slug
+  }
 }
 
-// Récupération des catégories
-// Filtrer les catégories qui correspondent au jeu
+if (!game) {
+  return {
+    status: 404,
+    body: 'Jeu non trouvé',
+  };
+}
 let gameCategories = Array.isArray(game.boardgamecategory)
   ? game.boardgamecategory
   : JSON.parse(game.boardgamecategory.replace(/'/g, '"'));
@@ -37,7 +28,6 @@ const responseFeedback = await fetch(`${import.meta.env.PUBLIC_BACKEND_URL}/api/
   credentials: 'include',
 });
 const feedbacks = await responseFeedback.json();
-
 ---
 
 <Layout>

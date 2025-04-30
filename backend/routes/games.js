@@ -7,5 +7,6 @@ router.get("/allgames", games.getAllGames);
 router.get('/categories', games.getAllCategories);
 router.get('/getfeedback/:id', games.getFeedbackByGameId);
 router.post('/addfeedback', games.addFeedback);
+router.get('/api/game/:slug', games.getGameBySlug);
 
 module.exports = router;
