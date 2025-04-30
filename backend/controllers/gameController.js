@@ -38,6 +38,8 @@ module.exports.getGames = async (req, res) => {
     }
 
     // Ajouter la pagination
+    const limitInt = parseInt(limit);
+    const offsetInt = parseInt(offset);
     query += ' LIMIT ? OFFSET ?';
     queryParams.push(limit, offset);
 
