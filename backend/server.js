@@ -28,6 +28,8 @@ app.use(cookieParser());
 app.use(express.json());
 app.use("/api", authRoutes);
 app.use("/api", gameRoutes);
+const backendUrl = process.env.PUBLIC_BACKEND_URL;
+console.log(`Backend URL: ${backendUrl}`);
 
 app.listen(port, () => {
     console.log(`Serveur back-end en écoute sur ${port}`);
