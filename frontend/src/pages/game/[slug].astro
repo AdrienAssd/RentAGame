@@ -11,6 +11,9 @@ let game = null;
 if (slug) {
   const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/game/${slug}`, {
     credentials: 'include',
+    headers: {
+      'Origin': 'https://rent-a-game-lac.vercel.app', // Ajoute explicitement l'origine
+    }
   });  // Utilisez l'API pour récupérer un jeu spécifique
   if (res.ok) {
     game = await res.json();  // Récupérer le jeu directement par son slug
@@ -29,6 +32,9 @@ let gameCategories = Array.isArray(game.boardgamecategory)
 
 const responseFeedback = await fetch(`https://rentagame-production-81ca.up.railway.app/api/getfeedback/${game.ID}`, {
   credentials: 'include',
+  headers: {
+    'Origin': 'https://rent-a-game-lac.vercel.app', // Ajoute explicitement l'origine
+  }
 });
 const feedbacks = await responseFeedback.json();
 ---
