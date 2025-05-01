@@ -3,7 +3,9 @@ import GameCard from '../components/GameCard.astro';
 import Layout from '../layouts/Layout.astro';
 
 // Récupération des catégories depuis l'API
-const categoriesResponse = await fetch(`https://rentagame-production-81ca.up.railway.app/api/categories`);
+const categoriesResponse = await fetch(`https://rentagame-production-81ca.up.railway.app/api/categories`, {
+  credentials: 'include',
+});
 const categories = await categoriesResponse.json();
 
 // Appel API pour récupérer les jeux (avec pagination)
