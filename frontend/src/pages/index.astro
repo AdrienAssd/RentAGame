@@ -177,6 +177,9 @@ const games = await response.json();
         gamesList.innerHTML = '';  // Réinitialise la liste de jeux avant la recherche
         currentPage = 1;
         currentSearchQuery = query;
+        console.log(`Recherche de jeux avec la requête : ${query}`);
+        loadMoreButton.disabled = false;
+        loadMoreButton.textContent = 'Afficher plus';
         // Recharge la page 1 de /api/games
         await loadGamesPage(1);
       }
@@ -187,6 +190,7 @@ const games = await response.json();
       searchInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           const q = searchInput.value.trim();
+          console.log(`${q}`);
           if (q) searchGames(q);
         }
       });
