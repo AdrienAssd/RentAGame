@@ -57,9 +57,6 @@ module.exports.getGames = async (req, res) => {
     query += ` LIMIT ${limitInt} OFFSET ${offsetInt}`;
 
     // LOG des paramètres avant l'exécution de la requête
-    console.log("Exécution de la requête SQL : ", query);
-    console.log("Avec les paramètres : ", queryParams);
-
     // Exécution de la requête
     const [details] = await db.execute(query, queryParams);
 

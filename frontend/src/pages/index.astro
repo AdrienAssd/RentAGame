@@ -97,7 +97,6 @@ const games = await response.json();
       const categorySelect  = document.getElementById('category-select');
   
       // Debug : assure-toi qu'on les récupère bien
-      console.log({ loadMoreButton, searchInput, searchButton, categorySelect });
   
       // État
       let currentPage     = 1;
@@ -138,18 +137,15 @@ const games = await response.json();
         if (isLoading) return;  // Empêche de charger une nouvelle page si déjà en cours
         isLoading = true;
         const searchQuery = currentSearchQuery ? `&search=${encodeURIComponent(currentSearchQuery)}` : '';
-        console.log(`Requête de recherche : ${searchQuery}`);
         const catQuery = currentCategory
           ? `&category=${encodeURIComponent(currentCategory)}`
           : '';
-        console.log(`Chargement page ${page}, catégorie = "${currentCategory}"`);
   
         const res = await fetch(
           `https://rentagame-production-81ca.up.railway.app/api/games?page=${page}&limit=${limit}${catQuery}${searchQuery}`,
           { credentials: 'include' }
         );
         const newGames = await res.json();
-        console.log('Jeux reçus :', newGames);
   
         if (page === 1) {
           renderGames(newGames); // Affiche la première page
@@ -177,7 +173,6 @@ const games = await response.json();
         gamesList.innerHTML = '';  // Réinitialise la liste de jeux avant la recherche
         currentPage = 1;
         currentSearchQuery = query;
-        console.log(`Recherche de jeux avec la requête : ${query}`);
         loadMoreButton.disabled = false;
         loadMoreButton.textContent = 'Afficher plus';
         // Recharge la page 1 de /api/games
@@ -190,7 +185,6 @@ const games = await response.json();
       searchInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           const q = searchInput.value.trim();
-          console.log(`${q}`);
           if (q) searchGames(q);
         }
       });
