@@ -38,7 +38,7 @@ module.exports.getGames = async (req, res) => {
       queryParams.push(`%${category}%`);  // Utilisation de LIKE pour filtrer par catégorie
     }
     if (searchQuery) {
-      whereClauses.push('primary_key LIKE ?');
+      whereClauses.push('LOWER(primary_key) LIKE LOWER(?)');
       queryParams.push(`%${searchQuery}%`);
     }
     if (whereClauses.length > 0) {
