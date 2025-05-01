@@ -28,13 +28,13 @@ module.exports.getGames = async (req, res) => {
     const offset = (page - 1) * limit; // Calculer l'offset pour la pagination
 
     // Requête de base
-    let query = 'SELECT id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description FROM details WHERE  1=1';
+    let query = 'SELECT id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description FROM details';
     // Paramètres de la requête
     let queryParams = [];
     let whereClauses = [];
     // Si une catégorie est spécifiée, ajouter un filtre sur la catégorie
     if (category) {
-      query += ' AND boardgamecategory LIKE ?';
+      whereClauses.push(' AND boardgamecategory LIKE ?');
       queryParams.push(`%${category}%`);  // Utilisation de LIKE pour filtrer par catégorie
     }
     if (searchQuery) {
