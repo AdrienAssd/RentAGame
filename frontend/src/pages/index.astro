@@ -5,6 +5,9 @@ import Layout from '../layouts/Layout.astro';
 // Récupération des catégories depuis l'API
 const categoriesResponse = await fetch(`https://rentagame-production-81ca.up.railway.app/api/categories`, {
   credentials: 'include',
+  headers: {
+    'Origin': 'https://rent-a-game-lac.vercel.app', // Ajoute explicitement l'origine
+  }
 });
 const categories = await categoriesResponse.json();
 
@@ -13,6 +16,9 @@ const page = 1;
 const limit = 10;
 const response = await fetch(`https://rentagame-production-81ca.up.railway.app/api/games?page=${page}&limit=${limit}`, {
   credentials: 'include',
+  headers: {
+    'Origin': 'https://rent-a-game-lac.vercel.app', // Ajoute explicitement l'origine
+  }
 });
 const games = await response.json();
 
@@ -194,6 +200,9 @@ const games = await response.json();
         currentCategory = cat || '';
         await loadGamesPage(1);
       });
+  
+      // Chargement initial
+      loadGamesPage(1);
     });
   </script>
 </Layout>
