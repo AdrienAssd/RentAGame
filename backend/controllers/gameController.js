@@ -33,7 +33,7 @@ module.exports.getGames = async (req, res) => {
     }
 
     // Requête de base
-    let query = 'SELECT details.id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description FROM details LEFT JOIN ratings ON details.id = ratings.id';
+    let query = 'SELECT details.id, primary_key, minplayers, maxplayers, minage, boardgamecategory, ratings.thumbnail, description FROM details LEFT JOIN ratings ON details.id = ratings.id';
     let queryParams = [];
     let whereClauses = [];
 
