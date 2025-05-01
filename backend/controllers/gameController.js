@@ -24,19 +24,25 @@ module.exports.getGames = async (req, res) => {
     const db = await getConnection();
 
     // Récupérer les paramètres de pagination et de catégorie depuis la requête
-    const { page = 1, limit = 10, category = '' } = req.query;  // 'category' est le paramètre de filtrage
+    const { page = 1, limit = 10, category = '', searchQuery = '' } = req.query;
     const offset = (page - 1) * limit; // Calculer l'offset pour la pagination
 
     // Requête de base
     let query = 'SELECT id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description FROM details';
     let queryParams = [];
-
+    let whereClauses = [];
     // Si une catégorie est spécifiée, ajouter un filtre sur la catégorie
     if (category) {
       query += ' WHERE boardgamecategory LIKE ?';
       queryParams.push(`%${category}%`);  // Utilisation de LIKE pour filtrer par catégorie
     }
-
+    if (searchQuery) {
+      whereClauses.push('primary_key LIKE ?');
+      queryParams.push(`%${searchQuery}%`);
+    }
+    if (whereClauses.length > 0) {
+      query += ' WHERE ' + whereClauses.join(' AND ');
+    }
     
     // Nouvelle pagination : on injecte directement les valeurs numériques
     const limitInt  = parseInt(limit, 10);
