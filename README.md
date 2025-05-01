@@ -51,6 +51,7 @@ Exemple : ajout d’un bouton de recherche, correction du bug de connexion
 Quand il s'agit de grosses parties du code à revoir, il est préférable de créer des branches.
 
 Avant de proposer une modification, ouvrez une pull request (PR) en expliquant : 
+
     Ce que vous avez changé
 
     Pourquoi
@@ -58,7 +59,7 @@ Avant de proposer une modification, ouvrez une pull request (PR) en expliquant :
     Et en ajoutant des screenshots si nécessaire
 
 ## Structure du projet
-
+```bash
 RentAGame/
 │
 ├── backend/                        → Serveur Node.js avec gestion des sessions et API
@@ -75,6 +76,7 @@ RentAGame/
 │
 ├── README.md                       → Documentation du projet
 └── .gitignore
+```
 
 ## Fonctionnalités principales :
 
