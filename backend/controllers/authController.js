@@ -59,6 +59,7 @@ exports.login = async (req, res) => {
 
     // Création du token
     const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    console.log(process.env.NODE_ENV);
 
     res.cookie("token", token, {
       httpOnly: true,
