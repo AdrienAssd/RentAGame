@@ -42,7 +42,7 @@ const feedbacks = await responseFeedback.json();
 <Layout>
   <header class="flex justify-between items-center p-4 shadow bg-white">
     <div class="flex items-center gap-2">
-      <img src="/images/LogoRentAGame.png" alt="Logo" class="h-10">
+      <img src="/images/LogoRentAGame.png" alt="Logo" class="h-10" loading="lazy">
       <h1 class="text-xl font-bold">{game.title}</h1>
     </div>
     <nav class="space-x-4">
@@ -54,7 +54,7 @@ const feedbacks = await responseFeedback.json();
   </header>
 
   <section class="relative bg-white p-4 shadow-md">
-    <img src={game.image} alt={`${game.title} Banner`} class="rounded-lg w-full h-64 object-cover" />
+    <img src={game.image} alt={`${game.title} Banner`} class="rounded-lg w-full h-64 object-cover" loading="lazy"/>
     <div class="absolute bottom-6 left-6 text-white">
       <h1 class="text-4xl font-bold">{game.title}</h1>
       <div class="mt-4 space-x-2">

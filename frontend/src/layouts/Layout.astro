@@ -32,7 +32,7 @@
 		const profileLink = document.createElement('a');
 		profileLink.href = '/profil';
 		profileLink.innerHTML = `
-			<img src="/images/profil-icon.png" alt="Profil" class="h-8 w-8 rounded-full object-cover" />
+			<img src="/images/profil-icon.png" alt="Profil" class="h-8 w-8 rounded-full object-cover" loading="lazy" />
 		`;
 		profileLink.className = "inline-block";
 		loginButton.replaceWith(profileLink);
