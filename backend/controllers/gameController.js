@@ -34,11 +34,11 @@ module.exports.getGames = async (req, res) => {
     let whereClauses = [];
     // Si une catégorie est spécifiée, ajouter un filtre sur la catégorie
     if (category) {
-      whereClauses.push(' AND boardgamecategory LIKE ?');
+      whereClauses.push('boardgamecategory LIKE ?');
       queryParams.push(`%${category}%`);  // Utilisation de LIKE pour filtrer par catégorie
     }
     if (searchQuery) {
-      whereClauses.push(' AND primary_key LIKE ?');
+      whereClauses.push('primary_key LIKE ?');
       queryParams.push(`%${searchQuery}%`);
     }
     if (whereClauses.length > 0) {
