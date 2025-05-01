@@ -89,7 +89,7 @@ module.exports.getGames = async (req, res) => {
         description: detail.description,
         minage: detail.minage,
         boardgamecategory: categories,
-        image: detail.thumbnail ? getValidThumbnail(detail.thumbnail) : '/images/default-thumbnail.jpg',
+        image: getValidThumbnail(detail.thumbnail),
         slug: detail.primary_key.toLowerCase().replace(/\s+/g, '-'),
       };
     });
