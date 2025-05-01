@@ -93,7 +93,6 @@ const games = await response.json();
   </div>
 
   <script is:inline type="module">
-    let currentSearchQuery = '';
     window.addEventListener('DOMContentLoaded', () => {
       // Références DOM
       const loadMoreButton  = document.getElementById('load-more');
@@ -109,6 +108,7 @@ const games = await response.json();
       let currentCategory = '';
       const limit         = 10;
       let isLoading = false;  // État pour vérifier si une requête est en cours
+      let currentSearchQuery = '';
   
       // Génère le HTML d’une carte jeu
       function createGameCardHtml(game) {
