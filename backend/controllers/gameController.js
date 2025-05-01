@@ -33,7 +33,7 @@ module.exports.getGames = async (req, res) => {
     }
 
     // Requête de base
-    let query = 'SELECT id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description FROM details';
+    let query = 'SELECT id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description FROM details LEFT JOIN ratings ON details.id = ratings.id';
     let queryParams = [];
     let whereClauses = [];
 
@@ -62,7 +62,6 @@ module.exports.getGames = async (req, res) => {
 
     // Exécution de la requête
     const [details] = await db.execute(query, queryParams);
-    const [ratings] = await db.execute('SELECT id, thumbnail FROM ratings');
 
     // Traitement des jeux récupérés
     const games = details.map(detail => {
@@ -81,7 +80,6 @@ module.exports.getGames = async (req, res) => {
       }
 
       // Trouver le rating correspondant à chaque jeu
-      const rating = ratings.find(r => r.id === detail.id);
 
       // Retourner les jeux avec toutes les données nécessaires
       return {
@@ -91,7 +89,7 @@ module.exports.getGames = async (req, res) => {
         description: detail.description,
         minage: detail.minage,
         boardgamecategory: categories,
-        image: rating && rating.thumbnail ? getValidThumbnail(rating.thumbnail) : '/images/default-thumbnail.jpg',
+        image: detail.thumbnail ? getValidThumbnail(detail.thumbnail) : '/images/default-thumbnail.jpg',
         slug: detail.primary_key.toLowerCase().replace(/\s+/g, '-'),
       };
     });
