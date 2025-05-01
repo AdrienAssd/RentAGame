@@ -29,12 +29,10 @@ app.use(cors({
 
 const compression = require('compression');
 app.use(compression());
-const apicache = require('apicache');
-const cache = apicache.middleware;
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api", authRoutes);
-app.use("/api", gameRoutes, cache('3 minutes'));
+app.use("/api", gameRoutes);
 
 
 app.listen(port, () => {
