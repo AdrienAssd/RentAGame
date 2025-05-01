@@ -24,33 +24,36 @@ module.exports.getGames = async (req, res) => {
     const db = await getConnection();
 
     // Récupérer les paramètres de pagination et de catégorie depuis la requête
-    const { page = 1, limit = 10, category = '', searchQuery = '' } = req.query;
+    const { page = 1, limit = 10, category = '', searchQuery = '' } = req.query;  // 'category' est le paramètre de filtrage
     const offset = (page - 1) * limit; // Calculer l'offset pour la pagination
+    const limitInt  = parseInt(limit, 10);
+    const offsetInt = parseInt((page - 1) * limitInt, 10);
+    if (isNaN(limitInt) || isNaN(offsetInt)) {
+      return res.status(400).json({ message: 'Paramètres de pagination invalides.' });
+    }
 
     // Requête de base
     let query = 'SELECT id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description FROM details';
-    // Paramètres de la requête
     let queryParams = [];
     let whereClauses = [];
+
     // Si une catégorie est spécifiée, ajouter un filtre sur la catégorie
     if (category) {
       whereClauses.push('boardgamecategory LIKE ?');
       queryParams.push(`%${category}%`);  // Utilisation de LIKE pour filtrer par catégorie
     }
     if (searchQuery) {
-      whereClauses.push('LOWER(primary_key) LIKE LOWER(?)');
+      whereClauses.push('primary_key LIKE ?');
       queryParams.push(`%${searchQuery}%`);
     }
+
     if (whereClauses.length > 0) {
       query += ' WHERE ' + whereClauses.join(' AND ');
     }
+
+
     
     // Nouvelle pagination : on injecte directement les valeurs numériques
-    const limitInt  = parseInt(limit, 10);
-    const offsetInt = parseInt((page - 1) * limitInt, 10);
-    if (isNaN(limitInt) || isNaN(offsetInt)) {
-      return res.status(400).json({ message: 'Paramètres de pagination invalides.' });
-    }
     query += ` LIMIT ${limitInt} OFFSET ${offsetInt}`;
 
     // LOG des paramètres avant l'exécution de la requête

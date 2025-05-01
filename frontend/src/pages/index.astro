@@ -138,6 +138,7 @@ const games = await response.json();
         if (isLoading) return;  // Empêche de charger une nouvelle page si déjà en cours
         isLoading = true;
         const searchQuery = currentSearchQuery ? `&search=${encodeURIComponent(currentSearchQuery)}` : '';
+        console.log(`Requête de recherche : ${searchQuery}`);
         const catQuery = currentCategory
           ? `&category=${encodeURIComponent(currentCategory)}`
           : '';
