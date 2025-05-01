@@ -9,7 +9,9 @@ console.log(slug);
 let game = null;
 
 if (slug) {
-  const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/game/${slug}`);  // Utilisez l'API pour récupérer un jeu spécifique
+  const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/game/${slug}`, {
+    credentials: 'include',
+  });  // Utilisez l'API pour récupérer un jeu spécifique
   if (res.ok) {
     game = await res.json();  // Récupérer le jeu directement par son slug
   }
