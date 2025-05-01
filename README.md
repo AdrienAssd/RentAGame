@@ -91,7 +91,7 @@ RentAGame/
 ## Historique des contributions
 Les contributions du site ont été faites sans pull requests car notre groupe ce que chaque personne faisait et comment cela allait fonctionner.
 On retrouve donc dans cet historique la mise en place des parties principales du site dans l'ordre décroissant (du plus vieux au plus récent).
-
+```bash
 Auteurs	                                Description
 Adrien, Alexandre, Thibault	            Mise en place du frontend	
 Alexandre, Julien	                    Ajout de la page des pages de connexion et enregistrement et début du backend
@@ -100,3 +100,4 @@ Adrien, Alexandre                       Déploiement du site sur Vercel (fronten
 Julien, Thibault, Catherine             Conception de la BDD, des requêtes, et du script SQL
 Adrien, Alexandre, Thibault             Mise en place de la BDD sur Railway (MySQL)
 Alexandre, Adrien                       Correction des problèmes après le déploiement
+```
