@@ -10,7 +10,8 @@ require("dotenv").config();
 
 const allowedOrigins = [
   'https://rent-a-game-lac.vercel.app', // site front déployé
-  'https://rent-a-game-9782yzq1d-adrienassds-projects.vercel.app', // alias Vercel preview
+  'https://rent-a-game-9782yzq1d-adrienassds-projects.vercel.app',
+  'https://rent-a-game-5ejlcvyj6-adrienassds-projects.vercel.app', // alias Vercel preview
 ];
 
 app.use(cors({
