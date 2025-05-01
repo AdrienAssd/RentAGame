@@ -16,14 +16,15 @@ const allowedOrigins = [
 app.use(cors({
   origin: (origin, callback) => {
     console.log("CORS Origin:", origin); // pour debug
-    if (allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Origine non autorisée par CORS'));
     }
   },
-  credentials: true, // essentiel pour que les cookies passent
+  credentials: true,
 }));
+
 
 
 app.use(cookieParser());
