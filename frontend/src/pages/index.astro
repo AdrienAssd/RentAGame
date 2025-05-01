@@ -2,8 +2,18 @@
 import GameCard from '../components/GameCard.astro';
 import Layout from '../layouts/Layout.astro';
 
-const page = 1; // Page initiale
-const limit = 10; // Nombre de jeux par page
+// Récupération des catégories depuis l'API
+const categoriesResponse = await fetch(`https://rentagame-production-81ca.up.railway.app/api/categories`, {
+  credentials: 'include',
+  headers: {
+    'Origin': 'https://rent-a-game-lac.vercel.app', // Ajoute explicitement l'origine
+  }
+});
+const categories = await categoriesResponse.json();
+
+// Appel API pour récupérer les jeux (avec pagination)
+const page = 1;
+const limit = 10;
 const response = await fetch(`https://rentagame-production-81ca.up.railway.app/api/games?page=${page}&limit=${limit}`, {
   credentials: 'include',
   headers: {
@@ -11,8 +21,8 @@ const response = await fetch(`https://rentagame-production-81ca.up.railway.app/a
   }
 });
 const games = await response.json();
----
 
+---
 <Layout>
   <header class="flex justify-between items-center p-4 shadow bg-white">
     <div class="flex items-center gap-2">
@@ -49,12 +59,25 @@ const games = await response.json();
       <div class="mb-4">
         <select id="category-select" class="px-4 py-2 border rounded">
           <option value="">Toutes les catégories</option>
-          <!-- Les options des catégories seront ajoutées dynamiquement -->
+          {categories.map((cat: any) => (
+            <option value={cat}>{cat}</option>
+          ))}
         </select>
       </div>
 
       <div id="games-list" class="grid grid-cols-5 gap-4">
-        <!-- Les cartes de jeux seront ajoutées dynamiquement -->
+        {games.map((game: any) => (
+          <GameCard 
+            key={game.slug}
+            title={game.title} 
+            image={game.image} 
+            slug={game.slug} 
+            minplayers={game.minplayers} 
+            maxplayers={game.maxplayers} 
+            minage={game.minage}
+            description={game.description}
+          />
+        ))}
       </div>
 
       <button id="load-more" class="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
@@ -65,8 +88,7 @@ const games = await response.json();
 
   <script is:inline type="module">
     let currentSearchQuery = '';
-    let categories = [];
-    window.addEventListener('DOMContentLoaded', async () => {
+    window.addEventListener('DOMContentLoaded', () => {
       // Références DOM
       const loadMoreButton  = document.getElementById('load-more');
       const gamesList       = document.getElementById('games-list');
@@ -74,21 +96,16 @@ const games = await response.json();
       const searchButton    = document.getElementById('search-button');
       const categorySelect  = document.getElementById('category-select');
   
-      // Récupérer les catégories depuis l'API
-      const categoriesResponse = await fetch('https://rentagame-production-81ca.up.railway.app/api/categories', {
-        credentials: 'include',
-        headers: { 'Origin': 'https://rent-a-game-lac.vercel.app' }
-      });
-      categories = await categoriesResponse.json();
-      // Remplir le menu déroulant des catégories
-      categories.forEach((cat) => {
-        const option = document.createElement('option');
-        option.value = cat;
-        option.textContent = cat;
-        categorySelect.appendChild(option);
-      });
-
-      // Fonction de génération des cartes de jeux
+      // Debug : assure-toi qu'on les récupère bien
+      console.log({ loadMoreButton, searchInput, searchButton, categorySelect });
+  
+      // État
+      let currentPage     = 1;
+      let currentCategory = '';
+      const limit         = 10;
+      let isLoading = false;  // État pour vérifier si une requête est en cours
+  
+      // Génère le HTML d’une carte jeu
       function createGameCardHtml(game) {
         return `
           <a href="/game/${game.slug}" class="game-card-link">
@@ -105,67 +122,94 @@ const games = await response.json();
           </a>
         `;
       }
-
-      // Affiche les jeux dans le DOM
+  
+      // Ajoute un tableau de jeux au DOM (sans réinitialiser la liste existante)
       function renderGames(games) {
-        gamesList.innerHTML = games.map(createGameCardHtml).join('');
+        gamesList.innerHTML = games.map(createGameCardHtml).join(''); // Réinitialise et affiche les jeux
       }
 
-      // Fonction de chargement des jeux avec pagination
+      // Fonction de mise à jour des jeux sans duplication
+      function appendGames(games) {
+        gamesList.innerHTML += games.map(createGameCardHtml).join(''); // Ajoute les nouveaux jeux au bas de la liste
+      }
+  
+      // Charge une page de jeux, en appliquant le filtre catégorie si présent
       async function loadGamesPage(page) {
+        if (isLoading) return;  // Empêche de charger une nouvelle page si déjà en cours
+        isLoading = true;
         const searchQuery = currentSearchQuery ? `&search=${encodeURIComponent(currentSearchQuery)}` : '';
-        const catQuery = currentCategory ? `&category=${encodeURIComponent(currentCategory)}` : '';
-        const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/games?page=${page}&limit=10${catQuery}${searchQuery}`, { credentials: 'include' });
+        console.log(`Requête de recherche : ${searchQuery}`);
+        const catQuery = currentCategory
+          ? `&category=${encodeURIComponent(currentCategory)}`
+          : '';
+        console.log(`Chargement page ${page}, catégorie = "${currentCategory}"`);
+  
+        const res = await fetch(
+          `https://rentagame-production-81ca.up.railway.app/api/games?page=${page}&limit=${limit}${catQuery}${searchQuery}`,
+          { credentials: 'include' }
+        );
         const newGames = await res.json();
+        console.log('Jeux reçus :', newGames);
+  
         if (page === 1) {
-          renderGames(newGames);
+          renderGames(newGames); // Affiche la première page
         } else {
-          appendGames(newGames);
+          appendGames(newGames); // Ajoute les jeux à la liste sans la réinitialiser
         }
-        if (newGames.length < 10) {
+        isLoading = false; // Réinitialise l'état de chargement
+  
+        if (newGames.length < limit) {
           loadMoreButton.disabled = true;
           loadMoreButton.textContent = 'Tous les jeux sont affichés';
         }
       }
-
-      // Chargement des jeux à la première page
-      loadGamesPage(1);
-
-      // Fonction pour ajouter plus de jeux
-      function appendGames(games) {
-        gamesList.innerHTML += games.map(createGameCardHtml).join('');
-      }
-
-      // Afficher plus au clic
+  
+      // Afficher la page suivante au clic
       loadMoreButton.addEventListener('click', async () => {
         currentPage++;
         await loadGamesPage(currentPage);
       });
-
-      // Recherche des jeux
+  
+      // Recherche textuelle
+      async function searchGames(query) {
+        // Réinitialise filtre et liste
+        currentCategory = '';
+        gamesList.innerHTML = '';  // Réinitialise la liste de jeux avant la recherche
+        currentPage = 1;
+        currentSearchQuery = query;
+        console.log(`Recherche de jeux avec la requête : ${query}`);
+        loadMoreButton.disabled = false;
+        loadMoreButton.textContent = 'Afficher plus';
+        // Recharge la page 1 de /api/games
+        await loadGamesPage(1);
+      }
       searchButton.addEventListener('click', () => {
-        const query = searchInput.value.trim();
-        if (query) {
-          currentSearchQuery = query;
-          loadGamesPage(1);
-        }
+        const q = searchInput.value.trim();
+        if (q) searchGames(q);
       });
-
       searchInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-          const query = searchInput.value.trim();
-          if (query) {
-            currentSearchQuery = query;
-            loadGamesPage(1);
-          }
+          const q = searchInput.value.trim();
+          console.log(`${q}`);
+          if (q) searchGames(q);
         }
       });
-
+  
       // Filtrage par catégorie
       categorySelect.addEventListener('change', async (e) => {
-        currentCategory = e.target.value;
-        loadGamesPage(1);
+        const cat = e.target.value;
+        // Réinitialise liste et pagination
+        gamesList.innerHTML = '';  // Réinitialise la liste de jeux avant d'appliquer un filtre
+        currentPage = 1;
+        loadMoreButton.disabled = false;
+        loadMoreButton.textContent = 'Afficher plus';
+        // Applique ou retire le filtre
+        currentCategory = cat || '';
+        await loadGamesPage(1);
       });
+  
+      // Chargement initial
+      loadGamesPage(1);
     });
   </script>
 </Layout>
