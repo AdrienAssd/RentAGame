@@ -77,6 +77,10 @@ const feedbacks = await responseFeedback.json();
         <li class="text-gray-600 text-xs">Aucune catégorie disponible pour ce jeu.</li>
       )}
     </ul>
+    <button onclick={`window.location.href='/borrow/${game.slug}'`} class="bg-green-500 text-white px-4 py-2 rounded font-semibold shadow hover:bg-green-600">
+      Emprunter ce jeu
+    </button>
+
   </section>
   <div class="flex justify-center mt-6">
     <button id="avis-btn" class="bg-purple-100 text-purple-700 px-6 py-2 rounded-l-full font-semibold">Avis</button>

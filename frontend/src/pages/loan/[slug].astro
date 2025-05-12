@@ -1,0 +1,76 @@
+---
+
+const { slug } = Astro.params;
+
+// Récupère les infos du jeu
+const gameRes = await fetch(`https://rentagame-production-81ca.up.railway.app/api/games/${slug}`);
+if (!gameRes.ok) {
+  return new Response("Jeu introuvable", { status: 404 });
+}
+const game = await gameRes.json();
+
+// Vérifie si l'utilisateur est connecté
+const profileRes = await fetch(`https://rentagame-production-81ca.up.railway.app/api/profile`, {
+  credentials: 'include'
+});
+
+if (!profileRes.ok) {
+  return redirect('/login');
+}
+
+const userData = await profileRes.json();
+const userId = userData.id;
+
+// Si l'utilisateur soumet le formulaire, on effectue l'emprunt
+if (Astro.request.method === "POST") {
+  const today = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  const returnDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ');
+
+  await fetch(`https://rentagame-production-81ca.up.railway.app/api/addloan`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include',
+    body: JSON.stringify({
+      userId,
+      gameId: game.id,
+      date: today,
+      date1: returnDate,
+      statut: "en cours"
+    })
+  });
+
+  return redirect(`/game/${id}`);
+}
+---
+
+<html lang="fr">
+  <head>
+    <title>Confirmer l’emprunt</title>
+  </head>
+  <body class="min-h-screen bg-gray-100 text-gray-800 flex items-center justify-center px-4">
+    <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-xl">
+      <h1 class="text-2xl font-bold mb-6 text-center">Confirmation de l’emprunt</h1>
+      
+      <div class="mb-4">
+        <p><strong>Jeu :</strong> {game.name}</p>
+        <p><strong>Genre :</strong> {game.genre}</p>
+        <p><strong>Plateforme :</strong> {game.platform}</p>
+        <p><strong>Date d’emprunt :</strong> {new Date().toLocaleDateString()}</p>
+        <p><strong>Date de retour prévue :</strong> {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
+        <p class="mt-2 text-sm text-gray-500">L'emprunt est gratuit. Vous avez 7 jours pour retourner le jeu.</p>
+      </div>
+
+      <form method="POST">
+        <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded font-semibold transition">
+          Confirmer l’emprunt
+        </button>
+      </form>
+
+      <div class="mt-4 text-center">
+        <a href={`/game/${game.slug}`} class="text-blue-500 hover:underline text-sm">Annuler et retourner à la fiche du jeu</a>
+      </div>
+    </div>
+  </body>
+</html>
