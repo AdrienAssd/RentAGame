@@ -208,6 +208,7 @@ module.exports.getGames = async (req, res) => {
         `SELECT * FROM feedback WHERE game_ID = ?`,
         [gameId]
       );
+      console.log(feedbacks);
 
   
       await db.end();
