@@ -28,7 +28,10 @@ if (!game) {
 }
 // Vérifie si l'utilisateur est connecté
 const profileRes = await fetch(`https://rentagame-production-81ca.up.railway.app/api/profile`, {
-  credentials: 'include'
+  credentials: 'include',
+  headers: {
+      'Origin': 'https://rent-a-game-lac.vercel.app', // Ajoute explicitement l'origine
+    }
 });
 
 if (!profileRes.ok) {
