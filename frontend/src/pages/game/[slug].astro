@@ -220,10 +220,7 @@ const feedbacks = await responseFeedback.json();
   
       if (response.ok) {
         alert('Avis soumis avec succès!');
-        feedbackForm.reset();
-        const newFeedbacks = await fetch(`https://rentagame-production-81ca.up.railway.app/api/getfeedback/${gameId}`);
-        const updatedFeedbacks = await newFeedbacks.json();
-        displayFeedbacks(updatedFeedbacks);
+        location.reload();
       } else {
         alert('Une erreur est survenue lors de l\'envoi de l\'avis');
       }
