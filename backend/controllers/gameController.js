@@ -203,7 +203,7 @@ module.exports.getGames = async (req, res) => {
   
       // Requête avec jointure entre feedback et users (supposons que la table des utilisateurs s'appelle `users`)
       const [feedbacks] = await db.execute(
-        `SELECT * FROM view_feedback_user WHERE ID = ?`,
+        `SELECT * FROM view_feedback_user WHERE game_ID = ?`,
         [gameId]
       );
 
