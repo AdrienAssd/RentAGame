@@ -45,7 +45,7 @@ const feedbacks = await responseFeedback.json();
   <header class="flex justify-between items-center p-4 shadow bg-white">
     <div class="flex items-center gap-2">
       <img src="/images/LogoRentAGame.webp" alt="Logo" class="h-10" loading="lazy">
-      <h1 class="text-xl font-bold">{game.slug}</h1>
+      <h1 class="text-xl font-bold">{game.title}</h1>
     </div>
     <nav class="space-x-4">
       <a href="/" class="text-gray-600 hover:text-black">Liste des jeux</a>
@@ -77,7 +77,7 @@ const feedbacks = await responseFeedback.json();
         <li class="text-gray-600 text-xs">Aucune catégorie disponible pour ce jeu.</li>
       )}
     </ul>
-    <button onclick={`window.location.href='/borrow/${game.slug}'`} class="bg-green-500 text-white px-4 py-2 rounded font-semibold shadow hover:bg-green-600">
+    <button onclick={`window.location.href='/loan/${game.slug}'`} class="bg-green-500 text-white px-4 py-2 rounded font-semibold shadow hover:bg-green-600">
       Emprunter ce jeu
     </button>
 
