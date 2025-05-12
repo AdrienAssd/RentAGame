@@ -130,7 +130,7 @@ const feedbacks = await responseFeedback.json();
 
   <script is:inline>
     window.gameData = {
-      id: `${Astro.props.game.ID}` // Utilisez Astro.props pour accéder à la donnée
+      id: `${game.ID}` // Injectez la variable côté serveur directement dans le script
     };
     async function isUserAuthenticated() {
       const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/profile`, { method: 'GET', credentials: 'include' });
