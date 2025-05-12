@@ -1,4 +1,5 @@
 const mysql = require('mysql2/promise');
+const jwt = require("jsonwebtoken");
 
 // Connexion directe à la BDD (améliorable si tu veux plus tard)
 const dbConfig = {
@@ -219,11 +220,17 @@ module.exports.getGames = async (req, res) => {
   // POST /api/feedback
   module.exports.addFeedback = async (req, res) => {
     const { gameId, rating, description } = req.body;
-    const userId = req.session?.user?.ID; // Vérifie si l'utilisateur est connecté
-    console.log("User ID:", userId); // Log pour vérifier l'ID de l'utilisateur
-    console.log("Game ID:", gameId); // Log pour vérifier l'ID du jeu
-    console.log("Rating:", rating); // Log pour vérifier la note
-    console.log("Description:", description); // Log pour vérifier la description
+    const token = req.cookies.token;
+    if (!token) return res.status(401).json({ message: "Utilisateur non authentifié (pas de token)" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userEmail = decoded.email;
+
+    const db = await getConnection();
+    const [userRows] = await db.execute('SELECT ID FROM utilisateur WHERE email = ?', [userEmail]);
+    if (userRows.length === 0) return res.status(404).json({ message: "Utilisateur introuvable" });
+
+    const userId = userRows[0].ID;
 
     if (!userId) {
       return res.status(401).json({ message: "Utilisateur non authentifié" });
