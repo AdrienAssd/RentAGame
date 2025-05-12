@@ -205,7 +205,6 @@ const feedbacks = await responseFeedback.json();
       const description = document.getElementById('description').value;
       const gameContainer = document.getElementById('game-container');
       const gameId = gameContainer.dataset.id;
-      console.log(gameId);
       const response = await fetch(`https://rentagame-production-81ca.up.railway.app/api/addfeedback`, {
         method: 'POST', 
         headers: {
@@ -222,7 +221,7 @@ const feedbacks = await responseFeedback.json();
       if (response.ok) {
         alert('Avis soumis avec succès!');
         feedbackForm.reset();
-        const newFeedbacks = await fetch(`https://rentagame-production-81ca.up.railway.app/api/getfeedback/${game.ID}`);
+        const newFeedbacks = await fetch(`https://rentagame-production-81ca.up.railway.app/api/getfeedback/${gameId}`);
         const updatedFeedbacks = await newFeedbacks.json();
         displayFeedbacks(updatedFeedbacks);
       } else {
