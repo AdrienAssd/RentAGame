@@ -58,7 +58,7 @@ if (Astro.request.method === "POST") {
     })
   });
 
-  return redirect(`/game/${id}`);
+  return redirect(`/game/${game.slug}`);
 }
 ---
 
