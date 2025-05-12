@@ -31,7 +31,6 @@ let gameCategories = Array.isArray(game.boardgamecategory)
   : JSON.parse(game.boardgamecategory.replace(/'/g, '"'));
 
 const gameId = game.id; // Assurez-vous que game.id est défini
-console.log(gameId);
 const responseFeedback = await fetch(`https://rentagame-production-81ca.up.railway.app/api/getfeedback/${gameId}`, {
   credentials: 'include',
   headers: {
