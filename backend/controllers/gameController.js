@@ -220,6 +220,10 @@ module.exports.getGames = async (req, res) => {
   module.exports.addFeedback = async (req, res) => {
     const { gameId, rating, description } = req.body;
     const userId = req.session?.user?.ID; // Vérifie si l'utilisateur est connecté
+    console.log("User ID:", userId); // Log pour vérifier l'ID de l'utilisateur
+    console.log("Game ID:", gameId); // Log pour vérifier l'ID du jeu
+    console.log("Rating:", rating); // Log pour vérifier la note
+    console.log("Description:", description); // Log pour vérifier la description
 
     if (!userId) {
       return res.status(401).json({ message: "Utilisateur non authentifié" });
