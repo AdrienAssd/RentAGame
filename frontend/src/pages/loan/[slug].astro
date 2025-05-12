@@ -1,14 +1,31 @@
 ---
+import Layout from '../../layouts/Layout.astro';
+import type { AstroGlobal } from 'astro';
 
 const { slug } = Astro.params;
+console.log(slug);
 
-// Récupère les infos du jeu
-const gameRes = await fetch(`https://rentagame-production-81ca.up.railway.app/api/games/${slug}`);
-if (!gameRes.ok) {
-  return new Response("Jeu introuvable", { status: 404 });
+// Fetch dynamique des données
+let game = null;
+
+if (slug) {
+  const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/game/${slug}`, {
+    credentials: 'include',
+    headers: {
+      'Origin': 'https://rent-a-game-lac.vercel.app', // Ajoute explicitement l'origine
+    }
+  });  // Utilisez l'API pour récupérer un jeu spécifique
+  if (res.ok) {
+    game = await res.json();  // Récupérer le jeu directement par son slug
+  }
 }
-const game = await gameRes.json();
 
+if (!game) {
+  return {
+    status: 404,
+    body: 'Jeu non trouvé',
+  };
+}
 // Vérifie si l'utilisateur est connecté
 const profileRes = await fetch(`https://rentagame-production-81ca.up.railway.app/api/profile`, {
   credentials: 'include'
