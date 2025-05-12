@@ -239,7 +239,7 @@ module.exports.getGames = async (req, res) => {
     try {
       const db = await getConnection();
       await db.execute(
-        'INSERT INTO feedback (game_id, user_id, rating, description, date_fb) VALUES (?, ?, ?, ?, NOW())',
+        'INSERT INTO feedback (ID, user_id, rating, description, date_fb) VALUES (?, ?, ?, ?, NOW())',
         [gameId, userId, rating, description]
       );
       await db.end();
