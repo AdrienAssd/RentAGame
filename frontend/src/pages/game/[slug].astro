@@ -206,13 +206,13 @@ const feedbacks = await responseFeedback.json();
       const rating = document.getElementById('rating').value;
       const description = document.getElementById('description').value;
       const gameId = window.gameData.id;
-      console.log(gameId);
   
       const response = await fetch(`https://rentagame-production-81ca.up.railway.app/api/addfeedback`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           gameId,
           rating,
