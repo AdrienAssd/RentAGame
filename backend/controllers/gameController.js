@@ -33,7 +33,7 @@ module.exports.getGames = async (req, res) => {
     }
 
     // Requête de base
-    let query = 'SELECT details.id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description, ratings.thumbnail FROM details LEFT JOIN ratings ON details.id = ratings.id';
+    let query = 'SELECT * FROM view_game_summary'; // Utiliser la vue pour récupérer les jeux
     let queryParams = [];
     let whereClauses = [];
 
@@ -107,8 +107,8 @@ module.exports.getGames = async (req, res) => {
       // Récupérer les paramètres de pagination depuis la requête
   
       // Récupérer les jeux en fonction de la pagination
-      const [details] = await db.execute('SELECT id, primary_key, minplayers, maxplayers, minage, boardgamecategory, description FROM details');
-      const [ratings] = await db.execute('SELECT id, thumbnail FROM ratings');
+      cconst [details] = await db.execute('SELECT * FROM view_game_summary');
+
   
       // Vérification des données de ratings
   
@@ -126,8 +126,6 @@ module.exports.getGames = async (req, res) => {
             .split(',')
             .map(cat => cat.trim());
         }
-        // Trouver le rating correspondant à chaque jeu en comparant les IDs
-        const rating = ratings.find(r => r.id === detail.id);
   
         // Log pour vérifier les valeurs récupérées
   
@@ -138,7 +136,7 @@ module.exports.getGames = async (req, res) => {
           description: detail.description,
           minage: detail.minage,
           boardgamecategory: detail.boardgamecategory,
-          image: rating && rating.thumbnail ? getValidThumbnail(rating.thumbnail) : '/images/default-thumbnail.jpg',
+          image: detail.thumbnail ? getValidThumbnail(detail.thumbnail) : '/images/default-thumbnail.jpg',
           slug: detail.primary_key.toLowerCase().replace(/\s+/g, '-'),
         };
       });
@@ -204,12 +202,10 @@ module.exports.getGames = async (req, res) => {
   
       // Requête avec jointure entre feedback et users (supposons que la table des utilisateurs s'appelle `users`)
       const [feedbacks] = await db.execute(
-        `SELECT feedback.*, utilisateur.username 
-         FROM feedback 
-         JOIN utilisateur ON feedback.user_ID = utilisateur.user_ID 
-         WHERE feedback.ID = ?`,
+        `SELECT * FROM view_feedback_user WHERE ID = ?`,
         [gameId]
       );
+
   
       await db.end();
   
