@@ -108,7 +108,7 @@ module.exports.getGames = async (req, res) => {
       // Récupérer les paramètres de pagination depuis la requête
   
       // Récupérer les jeux en fonction de la pagination
-      cconst [details] = await db.execute('SELECT * FROM view_game_summary');
+      const [details] = await db.execute('SELECT * FROM view_game_summary');
 
   
       // Vérification des données de ratings
@@ -230,7 +230,7 @@ module.exports.getGames = async (req, res) => {
     const [userRows] = await db.execute('SELECT user_ID FROM utilisateur WHERE email = ?', [userEmail]);
     if (userRows.length === 0) return res.status(404).json({ message: "Utilisateur introuvable" });
 
-    const userId = userRows[0].ID;
+    const userId = userRows[0].user_ID;
 
     if (!userId) {
       return res.status(401).json({ message: "Utilisateur non authentifié" });
