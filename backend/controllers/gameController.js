@@ -227,7 +227,7 @@ module.exports.getGames = async (req, res) => {
     const userEmail = decoded.email;
 
     const db = await getConnection();
-    const [userRows] = await db.execute('SELECT ID FROM utilisateur WHERE email = ?', [userEmail]);
+    const [userRows] = await db.execute('SELECT user_ID FROM utilisateur WHERE email = ?', [userEmail]);
     if (userRows.length === 0) return res.status(404).json({ message: "Utilisateur introuvable" });
 
     const userId = userRows[0].ID;
