@@ -81,6 +81,7 @@ module.exports.getGames = async (req, res) => {
 
       // Retourner les jeux avec toutes les données nécessaires
       return {
+        id: detail.id,
         title: detail.primary_key,
         minplayers: detail.minplayers,
         maxplayers: detail.maxplayers,
@@ -131,6 +132,7 @@ module.exports.getGames = async (req, res) => {
         // Log pour vérifier les valeurs récupérées
   
         return {
+          id: detail.id,
           title: detail.primary_key,
           minplayers: detail.minplayers,
           maxplayers: detail.maxplayers,
@@ -289,6 +291,7 @@ module.exports.getGames = async (req, res) => {
     // Retourner les informations complètes du jeu avec son image
     const rating = ratings.length > 0 ? ratings[0] : null;
     res.json({
+      id: game.id,
       title: game.primary_key,
       description: game.description,
       minplayers: game.minplayers,
