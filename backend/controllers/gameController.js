@@ -200,6 +200,7 @@ module.exports.getGames = async (req, res) => {
   
   module.exports.getFeedbackByGameId = async (req, res) => {
     const { gameId } = req.params; // Récupérer l'ID du jeu depuis les paramètres de la requête
+    console.log("gameId", gameId);
     try {
       const db = await getConnection();
   
