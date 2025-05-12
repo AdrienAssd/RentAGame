@@ -130,7 +130,6 @@ const feedbacks = await responseFeedback.json();
   </section>
 
   <script is:inline>
-    console.log(window.gameData.id);
     async function isUserAuthenticated() {
       const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/profile`, { method: 'GET', credentials: 'include' });
       if (!res.ok) {
