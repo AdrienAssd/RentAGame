@@ -208,16 +208,16 @@ const feedbacks = await responseFeedback.json();
       const gameId = window.gameData.id;
   
       const response = await fetch(`https://rentagame-production-81ca.up.railway.app/api/addfeedback`, {
-        method: 'POST',
+        method: 'POST', 
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({
           gameId,
           rating,
           description,
         }),
+        credentials: 'include', // Inclure les cookies pour l'authentification
       });
   
       if (response.ok) {
