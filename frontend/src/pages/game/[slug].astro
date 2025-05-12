@@ -30,7 +30,9 @@ let gameCategories = Array.isArray(game.boardgamecategory)
   ? game.boardgamecategory
   : JSON.parse(game.boardgamecategory.replace(/'/g, '"'));
 
-const responseFeedback = await fetch(`https://rentagame-production-81ca.up.railway.app/api/getfeedback/${game.ID}`, {
+const gameId = game.id; // Assurez-vous que game.id est défini
+
+const responseFeedback = await fetch(`https://rentagame-production-81ca.up.railway.app/api/getfeedback/${gameId}`, {
   credentials: 'include',
   headers: {
     'Origin': 'https://rent-a-game-lac.vercel.app', // Ajoute explicitement l'origine
