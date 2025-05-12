@@ -199,8 +199,7 @@ module.exports.getGames = async (req, res) => {
   };
   
   module.exports.getFeedbackByGameId = async (req, res) => {
-    const gameId = req.params.id; // Récupérer l'ID du jeu depuis les paramètres de la requête
-    console.log("gameId", gameId);
+    const { gameId } = req.params; // Récupérer l'ID du jeu depuis les paramètres de la requête
     try {
       const db = await getConnection();
   
@@ -209,7 +208,6 @@ module.exports.getGames = async (req, res) => {
         `SELECT * FROM feedback WHERE game_ID = ?`,
         [gameId]
       );
-      console.log(feedbacks);
 
   
       await db.end();
