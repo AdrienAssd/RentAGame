@@ -308,3 +308,39 @@ module.exports.getGames = async (req, res) => {
     res.status(500).json({ message: 'Erreur lors de la récupération du jeu.' });
   }
 };
+
+module.exports.addLoan = async (req, res) => {
+  const { gameId, startDate, endDate } = req.body;
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ message: "Utilisateur non authentifié (pas de token)" });
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const userEmail = decoded.email;
+
+  const db = await getConnection();
+  const [userRows] = await db.execute('SELECT user_ID FROM utilisateur WHERE email = ?', [userEmail]);
+  if (userRows.length === 0) return res.status(404).json({ message: "Utilisateur introuvable" });
+
+  const userId = userRows[0].user_ID;
+
+  if (!userId) {
+    return res.status(401).json({ message: "Utilisateur non authentifié" });
+  }
+  console.log("userId", userId);
+  console.log("gameId", gameId);
+  console.log("startDate", startDate);
+  console.log("endDate", endDate);
+
+  // Vérification des données
+  try {
+    await db.execute(
+      'INSERT INTO loan (game_ID, user_ID, start_date, end_date) VALUES (?, ?, ?, ?)',
+      [gameId, userId, startDate, endDate]
+    );
+    await db.end();
+    res.status(201).json({ message: "Emprunt ajouté avec succès" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur lors de l'ajout de l'emprunt" });
+  }
+};

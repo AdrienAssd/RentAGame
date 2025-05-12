@@ -10,5 +10,6 @@ router.get('/categories', cache('5 minutes'), games.getAllCategories);
 router.get('/getfeedback/:gameId', games.getFeedbackByGameId);
 router.post('/addfeedback', games.addFeedback);
 router.get('/game/:slug', games.getGameBySlug);
+router.post('/addloan', games.addLoan);
 
 module.exports = router;
