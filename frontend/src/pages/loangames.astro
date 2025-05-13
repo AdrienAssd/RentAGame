@@ -22,9 +22,9 @@ const loanlist = await responseLoans.json();
             <a href="/login" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 hidden" id="login-btn">Connexion</a>
         </nav>
     </header>
+    <div class="bg-white p-4 rounded shadow mb-4">
     {loanlist.length > 0 ? (
         loanlist.map((loan: any) => (
-        <div class="bg-white p-4 rounded shadow mb-4">
             <div class="flex gap-4 items-center">
                 <img src={loan.thumbnail} alt={`${loan.title} Banner`} class="w-32 h-32 rounded-lg object-cover" loading="lazy"/>
             <div class="flex flex-col justify-between">
@@ -33,9 +33,9 @@ const loanlist = await responseLoans.json();
                 <p class="text-sm text-gray-600">Fin le {loan.endDate}</p>
             </div>
             </div>
-        </div>
         ))
     ) : (
         <p class="text-gray-600 text-center">Aucun jeu emprunté.</p>
     )}
+    </div>
 </Layout>

@@ -366,7 +366,7 @@ module.exports.getLoans = async (req, res) => {
   if (userRows.length === 0) return res.status(404).json({ message: "Utilisateur introuvable" });
 
   const userId = userRows[0].user_ID;
-
+  console.log(userId);
   if (!userId) {
     return res.status(401).json({ message: "Utilisateur non authentifié" });
   }
@@ -388,6 +388,7 @@ module.exports.getLoans = async (req, res) => {
       endDate: loan.date1,
       statut: loan.statut,
     }));
+    console.log(loansWithDetails);
 
     await db.end();
     res.json(loansWithDetails); // Retourner les emprunts avec les détails du jeu
