@@ -1,5 +1,16 @@
 ---
+
 import Layout from "../layouts/Layout.astro";
+const profileRes = await fetch(`https://rentagame-production-81ca.up.railway.app/api/profile`, {
+  credentials: 'include',
+  headers: {
+      'Origin': 'https://rent-a-game-lac.vercel.app', // Ajoute explicitement l'origine
+    }
+});
+
+if (!profileRes.ok) {
+  return redirect('/login');
+}
 const responseLoans = await fetch(`https://rentagame-production-81ca.up.railway.app/api/getloans`, {
   credentials: 'include',
   headers: {
@@ -23,20 +34,51 @@ const loanlist = await responseLoans.json();
         </nav>
     </header>
     
-    {loanlist.length > 0 ? (
-        loanlist.map((loan: any) => (
-        <div class="bg-white p-4 rounded shadow mb-4">
-            <div class="flex gap-4 items-center">
-                <img src={loan.thumbnail} alt={`${loan.title} Banner`} class="w-32 h-32 rounded-lg object-cover" loading="lazy"/>
-            <div class="flex flex-col justify-between">
-                <a href={loan.url} target="_blank" rel="noopener noreferrer" class="font-bold text-lg text-blue-600 hover:underline">{loan.title}</a>
-                <p class="text-sm text-gray-600 mt-1">Emprunté le {loan.startDate}</p>
-                <p class="text-sm text-gray-600">Fin le {loan.endDate}</p>
-            </div>
-            </div>
-        </div>
-        ))
-    ) : (
-        <p class="text-gray-600 text-center">Aucun jeu emprunté.</p>
-    )}
+    <div id="loan-container"></div>
+    <script>
+        window.addEventListener('DOMContentLoaded', async () => {
+            const profileRes = await fetch(`https://rentagame-production-81ca.up.railway.app/api/profile`, {
+                credentials: 'include',
+                headers: {
+                    'Origin': 'https://rent-a-game-lac.vercel.app', // Ajoute explicitement l'origine
+                }
+            });
+            if (!profileRes.ok) {
+                window.location.href = '/login';
+            }
+
+            const responseLoans = await fetch(`https://rentagame-production-81ca.up.railway.app/api/getloans`, {
+                credentials: 'include',
+                headers: {
+                    'Origin': 'https://rent-a-game-lac.vercel.app', // Ajoute explicitement l'origine
+                }
+            });
+            const loanlist = await responseLoans.json();
+            const loanContainer = document.getElementById('loan-container');
+            if (loanlist.length > 0 && loanContainer) {
+                loanlist.forEach((loan: any) => {
+                    const loanCard = document.createElement('div');
+                    loanCard.className = 'bg-white p-4 rounded shadow mb-4';
+                    loanCard.innerHTML = `
+                        <div class="flex gap-4 items-center">
+                            <img src="${loan.thumbnail}" alt="${loan.title} Banner" class="w-32 h-32 rounded-lg object-cover" loading="lazy"/>
+                            <div class="flex flex-col justify-between">
+                                <a href="${loan.url}" target="_blank" rel="noopener noreferrer" class="font-bold text-lg text-blue-600 hover:underline">${loan.title}</a>
+                                <p class="text-sm text-gray-600 mt-1">Emprunté le ${loan.startDate}</p>
+                                <p class="text-sm text-gray-600">Fin le ${loan.endDate}</p>
+                            </div>
+                        </div>
+                    `;
+                    loanContainer.appendChild(loanCard);
+                });
+            } else {
+                if (loanContainer) {
+                    const noLoansMessage = document.createElement('p');
+                    noLoansMessage.className = 'text-gray-600 text-center';
+                    noLoansMessage.textContent = 'Aucun jeu emprunté.';
+                    loanContainer.appendChild(noLoansMessage);
+                }
+            }
+        });
+    </script>
 </Layout>

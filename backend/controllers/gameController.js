@@ -355,7 +355,6 @@ module.exports.addLoan = async (req, res) => {
 };
 
 module.exports.getLoans = async (req, res) => {
-  console.log("getLoans");
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ message: "Utilisateur non authentifié (pas de token)" });
 
@@ -367,7 +366,6 @@ module.exports.getLoans = async (req, res) => {
   if (userRows.length === 0) return res.status(404).json({ message: "Utilisateur introuvable" });
 
   const userId = userRows[0].user_ID;
-  console.log(userId);
   if (!userId) {
     return res.status(401).json({ message: "Utilisateur non authentifié" });
   }
