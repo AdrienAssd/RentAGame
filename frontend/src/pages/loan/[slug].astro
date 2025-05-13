@@ -49,7 +49,8 @@ if (Astro.request.method === "POST") {
   await fetch(`https://rentagame-production-81ca.up.railway.app/api/addloan`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Origin': 'https://rent-a-game-lac.vercel.app', // Ajoute explicitement l'origine
     },
     credentials: 'include',
     body: JSON.stringify({
