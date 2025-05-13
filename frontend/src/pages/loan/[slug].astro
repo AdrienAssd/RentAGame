@@ -52,8 +52,6 @@ if (Astro.request.method === "POST") {
     credentials: 'include',
     body: JSON.stringify({
       gameId: game.id,
-      date: today,
-      date1: returnDate,
       statut: "emprunté"
     })
   });

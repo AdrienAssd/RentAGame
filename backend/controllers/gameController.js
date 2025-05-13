@@ -305,10 +305,8 @@ module.exports.getGames = async (req, res) => {
 
 module.exports.addLoan = async (req, res) => {
   console.log("addLoan");
-  const { gameId, startDate, endDate, statut } = req.body;
+  const { gameId, statut } = req.body;
   console.log("gameId", gameId);
-  console.log("startDate", startDate);
-  console.log("endDate", endDate);
   console.log("statut", statut);
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ message: "Utilisateur non authentifié (pas de token)" });
@@ -325,19 +323,17 @@ module.exports.addLoan = async (req, res) => {
   if (!userId) {
     return res.status(401).json({ message: "Utilisateur non authentifié" });
   }
-  if (!gameId || !startDate || !endDate) {
+  if (!gameId) {
     return res.status(400).json({ message: "Paramètres manquants" });
   }
   console.log("userId", userId);
   console.log("gameId", gameId);
-  console.log("startDate", startDate);
-  console.log("endDate", endDate);
 
   // Vérification des données
   try {
     await db.execute(
-      'INSERT INTO loan (game_ID, user_ID, date, date1, statut) VALUES (?, ?, ?, ?, ?)',
-      [gameId, userId, startDate, endDate, statut]
+      'INSERT INTO loan (game_ID, user_ID, date, date1, statut) VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY), ?)',
+      [gameId, userId, statut]
     );
     await db.end();
     res.status(201).json({ message: "Emprunt ajouté avec succès" });
