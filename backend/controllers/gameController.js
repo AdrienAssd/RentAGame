@@ -355,6 +355,7 @@ module.exports.addLoan = async (req, res) => {
 };
 
 module.exports.getLoans = async (req, res) => {
+  console.log("getLoans");
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ message: "Utilisateur non authentifié (pas de token)" });
 
