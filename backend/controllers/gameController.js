@@ -353,3 +353,46 @@ module.exports.addLoan = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de l'ajout de l'emprunt" });
   }
 };
+
+module.exports.getLoans = async (req, res) => {
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ message: "Utilisateur non authentifié (pas de token)" });
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const userEmail = decoded.email;
+
+  const db = await getConnection();
+  const [userRows] = await db.execute('SELECT user_ID FROM utilisateur WHERE email = ?', [userEmail]);
+  if (userRows.length === 0) return res.status(404).json({ message: "Utilisateur introuvable" });
+
+  const userId = userRows[0].user_ID;
+
+  if (!userId) {
+    return res.status(401).json({ message: "Utilisateur non authentifié" });
+  }
+  
+  try {
+    // Récupérer les emprunts de l'utilisateur
+    const [loans] = await db.execute(
+      `SELECT * FROM view_loan_user WHERE user_ID = ?`,
+      [userId]
+    );
+
+    // Traiter les emprunts récupérés
+    const loansWithDetails = loans.map(loan => ({
+      id: loan.id,
+      gameId: loan.game_ID,
+      title: loan.primary_key,
+      thumbnail: loan ? getValidThumbnail(loan.thumbnail) : '/images/default-thumbnail.jpg',
+      startDate: loan.date,
+      endDate: loan.date1,
+      statut: loan.statut,
+    }));
+
+    await db.end();
+    res.json(loansWithDetails); // Retourner les emprunts avec les détails du jeu
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur lors de la récupération des emprunts." });
+  }
+};

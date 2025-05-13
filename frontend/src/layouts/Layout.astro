@@ -12,33 +12,39 @@
     <script>
 	window.addEventListener('DOMContentLoaded', async () => {
 	const loginButton = document.getElementById('login-btn');
+	const loanLink = document.getElementById('loan-link');
 	if (!loginButton) {
 		console.warn("Le bouton de connexion n'existe pas dans la page");
+		return;
+	}
+	if (!loanLink) {
+		console.warn("Le bouton d'emprunt n'existe pas dans la page");
 		return;
 	}
 
 	try {
 		const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/profile`, {
-		method: 'GET',
-		credentials: 'include'
+			method: 'GET',
+			credentials: 'include'
 		});
 		if (!res.ok) {
-		console.error('Erreur API:', res.status);
-		return;
+			console.error('Erreur API:', res.status);
+			return;
 		}
 
 		const data = await res.json();
 
 		if (data.loggedIn) {
-		const profileLink = document.createElement('a');
-		profileLink.href = '/profil';
-		profileLink.innerHTML = `
-			<img src="/images/profil-icon.webp" alt="Profil" class="h-8 w-8 rounded-full object-cover" loading="lazy" />
-		`;
-		profileLink.className = "inline-block";
-		loginButton.replaceWith(profileLink);
+			const profileLink = document.createElement('a');
+			profileLink.href = '/profil';
+			profileLink.innerHTML = `
+				<img src="/images/profil-icon.webp" alt="Profil" class="h-8 w-8 rounded-full object-cover" loading="lazy" />
+			`;
+			profileLink.className = "inline-block";
+			loginButton.replaceWith(profileLink);
+			loanLink.classList.remove('hidden');
 		} else {
-		loginButton.classList.remove('hidden');
+			loginButton.classList.remove('hidden');
 		}
 
 	} catch (error) {
