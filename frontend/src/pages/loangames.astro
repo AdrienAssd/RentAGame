@@ -63,7 +63,7 @@ const loanlist = await responseLoans.json();
                         <div class="flex gap-4 items-center">
                             <img src="${loan.thumbnail}" alt="${loan.title} Banner" class="w-32 h-32 rounded-lg object-cover" loading="lazy"/>
                             <div class="flex flex-col justify-between">
-                                <a href="/game/${loan.title}" target="_blank" rel="noopener noreferrer" class="font-bold text-lg text-blue-600 hover:underline">${loan.title}</a>
+                                <a href="/game/${loan.title}" rel="noopener noreferrer" class="font-bold text-lg text-blue-600 hover:underline">${loan.title}</a>
                                 <p class="text-sm text-gray-600 mt-1">Emprunté le ${loan.startDate}</p>
                                 <p class="text-sm text-gray-600">Fin le ${loan.endDate}</p>
                             </div>
