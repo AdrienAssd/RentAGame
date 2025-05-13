@@ -64,6 +64,7 @@ if (!profileRes.ok) {
     <script type="module">
       const gameContainer = document.getElementById('game-container');
       const gameId = gameContainer.dataset.id;
+      const form = document.getElementById('loan-form');
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/addloan`, {
