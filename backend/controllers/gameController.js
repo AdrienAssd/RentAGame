@@ -306,9 +306,10 @@ module.exports.getGames = async (req, res) => {
 module.exports.addLoan = async (req, res) => {
   console.log("addLoan");
   const { gameId, startDate, endDate, statut } = req.body;
-  console.log("userId", userId);
   console.log("gameId", gameId);
   console.log("startDate", startDate);
+  console.log("endDate", endDate);
+  console.log("statut", statut);
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ message: "Utilisateur non authentifié (pas de token)" });
 
