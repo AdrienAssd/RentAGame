@@ -310,15 +310,20 @@ module.exports.addLoan = async (req, res) => {
   console.log("statut", statut);
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ message: "Utilisateur non authentifié (pas de token)" });
-
+  console.log("step 1");
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  console.log("step 2");
   const userEmail = decoded.email;
-
+  console.log("step 3");
   const db = await getConnection();
+  console.log("step 4");
   const [userRows] = await db.execute('SELECT user_ID FROM utilisateur WHERE email = ?', [userEmail]);
+  console.log("step 5");
   if (userRows.length === 0) return res.status(404).json({ message: "Utilisateur introuvable" });
+  console.log("step 6");
 
   const userId = userRows[0].user_ID;
+  console.log("step 7");
 
   if (!userId) {
     return res.status(401).json({ message: "Utilisateur non authentifié" });
