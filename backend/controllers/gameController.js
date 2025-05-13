@@ -200,7 +200,6 @@ module.exports.getGames = async (req, res) => {
   
   module.exports.getFeedbackByGameId = async (req, res) => {
     const { gameId } = req.params; // Récupérer l'ID du jeu depuis les paramètres de la requête
-    console.log("gameId", gameId);
     try {
       const db = await getConnection();
   
@@ -238,11 +237,6 @@ module.exports.getGames = async (req, res) => {
     if (!userId) {
       return res.status(401).json({ message: "Utilisateur non authentifié" });
     }
-    console.log("userId", userId);
-    console.log("gameId", gameId);
-    console.log("rating", rating);
-    console.log("description", description);
-    // Vérification des données
     try {
       const db = await getConnection();
       await db.execute(
@@ -325,6 +319,9 @@ module.exports.addLoan = async (req, res) => {
 
   if (!userId) {
     return res.status(401).json({ message: "Utilisateur non authentifié" });
+  }
+  if (!gameId || !startDate || !endDate) {
+    return res.status(400).json({ message: "Paramètres manquants" });
   }
   console.log("userId", userId);
   console.log("gameId", gameId);

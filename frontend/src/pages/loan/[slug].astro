@@ -38,9 +38,6 @@ if (!profileRes.ok) {
   return redirect('/login');
 }
 
-const userData = await profileRes.json();
-const userId = userData.id;
-
 // Si l'utilisateur soumet le formulaire, on effectue l'emprunt
 if (Astro.request.method === "POST") {
   const today = new Date().toISOString().slice(0, 19).replace('T', ' ');
@@ -54,7 +51,6 @@ if (Astro.request.method === "POST") {
     },
     credentials: 'include',
     body: JSON.stringify({
-      userId,
       gameId: game.id,
       date: today,
       date1: returnDate,
