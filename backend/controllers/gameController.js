@@ -304,7 +304,11 @@ module.exports.getGames = async (req, res) => {
 };
 
 module.exports.addLoan = async (req, res) => {
-  const { gameId, startDate, endDate } = req.body;
+  console.log("addLoan");
+  const { gameId, startDate, endDate, statut } = req.body;
+  console.log("userId", userId);
+  console.log("gameId", gameId);
+  console.log("startDate", startDate);
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ message: "Utilisateur non authentifié (pas de token)" });
 
@@ -331,8 +335,8 @@ module.exports.addLoan = async (req, res) => {
   // Vérification des données
   try {
     await db.execute(
-      'INSERT INTO loan (game_ID, user_ID, start_date, end_date) VALUES (?, ?, ?, ?)',
-      [gameId, userId, startDate, endDate]
+      'INSERT INTO loan (game_ID, user_ID, date, date1, statut) VALUES (?, ?, ?, ?, ?)',
+      [gameId, userId, startDate, endDate, statut]
     );
     await db.end();
     res.status(201).json({ message: "Emprunt ajouté avec succès" });
