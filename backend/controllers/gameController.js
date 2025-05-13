@@ -237,6 +237,14 @@ module.exports.getGames = async (req, res) => {
     if (!userId) {
       return res.status(401).json({ message: "Utilisateur non authentifié" });
     }
+    const [feedbackRows] = await db.execute(
+    'SELECT * FROM feedback WHERE game_ID = ? AND user_ID = ?',
+    [gameId, userId]
+  );
+
+  if (feedbackRows.length > 0) {
+    return res.status(409).json({ message: "Vous avez déjà mis un avis à ce jeu" });
+  }
     try {
       const db = await getConnection();
       await db.execute(
@@ -304,26 +312,21 @@ module.exports.getGames = async (req, res) => {
 };
 
 module.exports.addLoan = async (req, res) => {
-  console.log("addLoan");
   const { gameId, statut } = req.body;
-  console.log("gameId", gameId);
-  console.log("statut", statut);
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ message: "Utilisateur non authentifié (pas de token)" });
-  console.log("step 1");
+
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  console.log("step 2");
+
   const userEmail = decoded.email;
-  console.log("step 3");
+
   const db = await getConnection();
-  console.log("step 4");
+
   const [userRows] = await db.execute('SELECT user_ID FROM utilisateur WHERE email = ?', [userEmail]);
-  console.log("step 5");
+
   if (userRows.length === 0) return res.status(404).json({ message: "Utilisateur introuvable" });
-  console.log("step 6");
 
   const userId = userRows[0].user_ID;
-  console.log("step 7");
 
   if (!userId) {
     return res.status(401).json({ message: "Utilisateur non authentifié" });
@@ -331,9 +334,14 @@ module.exports.addLoan = async (req, res) => {
   if (!gameId) {
     return res.status(400).json({ message: "Paramètres manquants" });
   }
-  console.log("userId", userId);
-  console.log("gameId", gameId);
+  const [loanRows] = await db.execute(
+    'SELECT * FROM loan WHERE game_ID = ? AND user_ID = ? AND statut = "emprunté"',
+    [gameId, userId]
+  );
 
+  if (loanRows.length > 0) {
+    return res.status(409).json({ message: "Vous avez déjà emprunté ce jeu" });
+  }
   // Vérification des données
   try {
     await db.execute(

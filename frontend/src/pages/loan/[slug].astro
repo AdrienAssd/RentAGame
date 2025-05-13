@@ -3,7 +3,6 @@ import Layout from '../../layouts/Layout.astro';
 import type { AstroGlobal } from 'astro';
 
 const { slug } = Astro.params;
-console.log(slug);
 
 // Fetch dynamique des données
 let game = null;
@@ -80,9 +79,11 @@ if (!profileRes.ok) {
         });
 
         if (res.ok) {
+          alert("Emprunt confirmé avec succès !, retour à la page d'accueil");
           window.location.href = "/";
         } else {
-          alert("Erreur lors de l'emprunt");
+          const data = await res.json(); 
+          alert(data.message || "Erreur inconnue");
         }
       });
 </script>

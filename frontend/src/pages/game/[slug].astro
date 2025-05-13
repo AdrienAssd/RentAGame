@@ -227,7 +227,8 @@ const feedbacks = await responseFeedback.json();
         alert('Avis soumis avec succès!');
         location.reload();
       } else {
-        alert('Une erreur est survenue lors de l\'envoi de l\'avis');
+        const data = await res.json(); 
+        alert(data.message || "Erreur inconnue");
       }
     });
   </script>
