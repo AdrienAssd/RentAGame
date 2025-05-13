@@ -387,7 +387,6 @@ module.exports.getLoans = async (req, res) => {
       endDate: loan.date1,
       statut: loan.statut,
     }));
-    console.log(loansWithDetails);
 
     await db.end();
     res.json(loansWithDetails); // Retourner les emprunts avec les détails du jeu
