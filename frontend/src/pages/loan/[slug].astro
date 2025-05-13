@@ -79,7 +79,7 @@ if (!profileRes.ok) {
         });
 
         if (res.ok) {
-          alert("Emprunt confirmé avec succès !, retour à la page d'accueil");
+          alert("Emprunt confirmé avec succès ! Retour à la page d'accueil");
           window.location.href = "/";
         } else {
           const data = await res.json(); 

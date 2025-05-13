@@ -238,15 +238,13 @@ module.exports.getGames = async (req, res) => {
       return res.status(401).json({ message: "Utilisateur non authentifié" });
     }
     const [feedbackRows] = await db.execute(
-    'SELECT * FROM feedback WHERE game_ID = ? AND user_ID = ?',
-    [gameId, userId]
-  );
-
-  if (feedbackRows.length > 0) {
-    return res.status(409).json({ message: "Vous avez déjà mis un avis à ce jeu" });
-  }
+      'SELECT * FROM feedback WHERE game_ID = ? AND user_ID = ?',
+      [gameId, userId]
+    );
+    if (feedbackRows.length > 0) {
+      return res.status(409).json({ message: "Vous avez déjà mis un avis à ce jeu" });
+    }
     try {
-      const db = await getConnection();
       await db.execute(
         'INSERT INTO feedback (game_ID, user_ID, rating, description, date_fb) VALUES (?, ?, ?, ?, NOW())',
         [gameId, userId, rating, description]
