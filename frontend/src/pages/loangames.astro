@@ -9,7 +9,7 @@ const responseLoans = await fetch(`https://rentagame-production-81ca.up.railway.
 const loanlist = await responseLoans.json();
 ---
 <Layout>
-    <header>
+    <header class="flex justify-between items-center p-4 shadow bg-white">
         <div class="flex items-center gap-2">
         <img src="/images/LogoRentAGame.webp" alt="Logo" class="h-10" loading="lazy">
         <h1 class="text-xl font-bold">Mes emprunts</h1>

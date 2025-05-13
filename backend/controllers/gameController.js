@@ -374,13 +374,13 @@ module.exports.getLoans = async (req, res) => {
   try {
     // Récupérer les emprunts de l'utilisateur
     const [loans] = await db.execute(
-      `SELECT * FROM view_loan_user WHERE user_ID = ?`,
+      `SELECT * FROM view_loan_user WHERE user_ID = ? AND statut = "emprunté"`,
       [userId]
     );
 
     // Traiter les emprunts récupérés
     const loansWithDetails = loans.map(loan => ({
-      id: loan.id,
+      id: loan.ID,
       gameId: loan.game_ID,
       title: loan.primary_key,
       thumbnail: loan ? getValidThumbnail(loan.thumbnail) : '/images/default-thumbnail.jpg',
