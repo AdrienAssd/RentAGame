@@ -229,31 +229,37 @@ module.exports.getGames = async (req, res) => {
     const userEmail = decoded.email;
 
     const db = await getConnection();
-    const [userRows] = await db.execute('SELECT user_ID FROM utilisateur WHERE email = ?', [userEmail]);
-    if (userRows.length === 0) return res.status(404).json({ message: "Utilisateur introuvable" });
-
-    const userId = userRows[0].user_ID;
-
-    if (!userId) {
-      return res.status(401).json({ message: "Utilisateur non authentifié" });
-    }
-    const [feedbackRows] = await db.execute(
-      'SELECT * FROM feedback WHERE game_ID = ? AND user_ID = ?',
-      [gameId, userId]
-    );
-    if (feedbackRows.length > 0) {
-      return res.status(409).json({ message: "Vous avez déjà mis un avis à ce jeu" });
-    }
+    await db.beginTransaction();
     try {
+      const [userRows] = await db.execute('SELECT user_ID FROM utilisateur WHERE email = ?', [userEmail]);
+      if (userRows.length === 0) return res.status(404).json({ message: "Utilisateur introuvable" });
+
+      const userId = userRows[0].user_ID;
+
+      if (!userId) {
+        await db.rollback();
+        return res.status(401).json({ message: "Utilisateur non authentifié" });
+      }
+      const [feedbackRows] = await db.execute(
+        'SELECT * FROM feedback WHERE game_ID = ? AND user_ID = ?',
+        [gameId, userId]
+      );
+      if (feedbackRows.length > 0) {
+        await db.rollback();
+        return res.status(409).json({ message: "Vous avez déjà mis un avis à ce jeu" });
+      }
       await db.execute(
         'INSERT INTO feedback (game_ID, user_ID, rating, description, date_fb) VALUES (?, ?, ?, ?, NOW())',
         [gameId, userId, rating, description]
       );
-      await db.end();
+      await db.commit(); 
       res.status(201).json({ message: "Feedback ajouté avec succès" });
     } catch (error) {
+      await db.rollback();
       console.error(error);
       res.status(500).json({ message: "Erreur lors de l'ajout de l'avis" });
+    } finally {
+      await db.end();
     }
   };
 

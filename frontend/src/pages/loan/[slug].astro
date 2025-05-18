@@ -79,8 +79,12 @@ if (!profileRes.ok) {
             statut: "emprunté"
           })
         });
-
-        if (res.ok) {
+        // Vérifie si la réponse est correcte
+         if (res.status === 401) {
+          alert("Vous devez être connecté pour emprunter un jeu.");
+          window.location.href = "/login";
+          return;
+        } else if (res.ok) {
           alert("Emprunt confirmé avec succès ! Retour à la page d'accueil");
           window.location.href = "/";
         } else {
