@@ -4,22 +4,20 @@ import Layout from '../layouts/Layout.astro';
 let isAdmin = false;
 let users = [];
 let loans = [];
-const cookieHeader = Astro.request.headers.get('cookie');
 // Vérification du profil
 const res = await fetch('https://rentagame-production-81ca.up.railway.app/api/profile', {
-  credentials: 'include',
-  headers: {
-    'Origin': 'https://rent-a-game-lac.vercel.app',
-    'Cookie': cookieHeader ?? '', // on transmet les cookies au backend
-  },
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+        'Origin': 'https://rent-a-game-lac.vercel.app',
+    },
 });
 
-if (res.ok) {
-  const profile = await res.json();
-  isAdmin = profile?.isAdmin;
+const profile = await res.json();
+if (profile.loggedIn) {
+  isAdmin = profile.isAdmin;
 }
-
-if (!isAdmin) {
+if (!isAdmin || !profile.loggedIn) {
   return new Response(null, {
     status: 302,
     headers: {
@@ -32,17 +30,11 @@ if (!isAdmin) {
 const [usersRes, loansRes] = await Promise.all([
   fetch('https://rentagame-production-81ca.up.railway.app/api/admin/users', {
     credentials: 'include',
-    headers: {
-    'Origin': 'https://rent-a-game-lac.vercel.app',
-    'Cookie': cookieHeader ?? '', // on transmet les cookies au backend
-  },
+    headers: { 'Origin': 'https://rent-a-game-lac.vercel.app' },
   }),
   fetch('https://rentagame-production-81ca.up.railway.app/api/admin/loans', {
     credentials: 'include',
-    headers: {
-    'Origin': 'https://rent-a-game-lac.vercel.app',
-    'Cookie': cookieHeader ?? '', // on transmet les cookies au backend
-  },
+    headers: { 'Origin': 'https://rent-a-game-lac.vercel.app' },
   }),
 ]);
 
