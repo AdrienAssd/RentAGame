@@ -4,12 +4,13 @@ import Layout from '../layouts/Layout.astro';
 let isAdmin = false;
 let users = [];
 let loans = [];
-
+const cookieHeader = Astro.request.headers.get('cookie');
 // Vérification du profil
 const res = await fetch('https://rentagame-production-81ca.up.railway.app/api/profile', {
   credentials: 'include',
   headers: {
     'Origin': 'https://rent-a-game-lac.vercel.app',
+    'Cookie': cookieHeader ?? '', // on transmet les cookies au backend
   },
 });
 
@@ -31,11 +32,17 @@ if (!isAdmin) {
 const [usersRes, loansRes] = await Promise.all([
   fetch('https://rentagame-production-81ca.up.railway.app/api/admin/users', {
     credentials: 'include',
-    headers: { 'Origin': 'https://rent-a-game-lac.vercel.app' },
+    headers: {
+    'Origin': 'https://rent-a-game-lac.vercel.app',
+    'Cookie': cookieHeader ?? '', // on transmet les cookies au backend
+  },
   }),
   fetch('https://rentagame-production-81ca.up.railway.app/api/admin/loans', {
     credentials: 'include',
-    headers: { 'Origin': 'https://rent-a-game-lac.vercel.app' },
+    headers: {
+    'Origin': 'https://rent-a-game-lac.vercel.app',
+    'Cookie': cookieHeader ?? '', // on transmet les cookies au backend
+  },
   }),
 ]);
 
