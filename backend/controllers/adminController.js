@@ -42,8 +42,6 @@ module.exports.addGame = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
-  } finally {
-    db.end();
   }
 }
 
@@ -66,8 +64,6 @@ module.exports.deleteGame = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
-  } finally {
-    db.end();
   }
 }
 
@@ -82,8 +78,6 @@ module.exports.getUsers = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
-  } finally {
-    db.end();
   }
 }
 
@@ -98,8 +92,6 @@ module.exports.getFeedback = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
-  } finally {
-    db.end();
   }
 }
 
@@ -114,8 +106,6 @@ module.exports.getLoans = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
-  } finally {
-    db.end();
   }
 }
 
@@ -140,7 +130,5 @@ module.exports.deleteUser = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Erreur serveur." });
-  } finally {
-    db.end();
   }
 }
