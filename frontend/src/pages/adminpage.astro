@@ -47,19 +47,19 @@ import Layout from '../layouts/Layout.astro';
             <table class="min-w-full border border-gray-300">
               <thead class="bg-gray-100 text-left">
                 <tr>
-                  <th class="p-2 border">Nom</th>
-                  <th class="p-2 border">Email</th>
-                  <th class="p-2 border">Admin</th>
-                  <th class="p-2 border">Nb Emprunts</th>
-                  <th class="p-2 border">Nb Feedbacks</th>
+                  <th class="p-2 border text-center">Nom</th>
+                  <th class="p-2 border text-center">Email</th>
+                  <th class="p-2 border text-center">Admin</th>
+                  <th class="p-2 border text-center">Nb Emprunts</th>
+                  <th class="p-2 border text-center">Nb Feedbacks</th>
                 </tr>
               </thead>
               <tbody>
                 ${users.map(user => `
                   <tr class="hover:bg-gray-50">
-                    <td class="p-2 border">${user.name}</td>
+                    <td class="p-2 border">${user.userame}</td>
                     <td class="p-2 border">${user.email}</td>
-                    <td class="p-2 border text-center">${user.isAdmin ? '✅' : '❌'}</td>
+                    <td class="p-2 border text-center">${user.permission === 1 ? '✅' : '❌'}</td>
                     <td class="p-2 border text-center">${user.total_loans}</td>
                     <td class="p-2 border text-center">${user.total_feedbacks}</td>
                   </tr>
@@ -70,16 +70,16 @@ import Layout from '../layouts/Layout.astro';
         </section>
 
         <section class="mb-10">
-          <h2 class="text-xl font-semibold mb-4">📚 Emprunts en cours</h2>
+          <h2 class="text-xl font-semibold mb-4">📚 Liste des emprunts</h2>
           <div class="overflow-x-auto">
             <table class="min-w-full border border-gray-300">
               <thead class="bg-gray-100 text-left">
                 <tr>
-                  <th class="p-2 border">Nom de l'utilisateur</th>
-                  <th class="p-2 border">Nom du jeu</th>
-                  <th class="p-2 border">Date d'emprunt</th>
-                  <th class="p-2 border">Date de retour</th>
-                  <th class="p-2 border">Statut</th>
+                  <th class="p-2 border text-center">Nom de l'utilisateur</th>
+                  <th class="p-2 border text-center">Nom du jeu</th>
+                  <th class="p-2 border text-center">Date d'emprunt</th>
+                  <th class="p-2 border text-center">Date de retour</th>
+                  <th class="p-2 border text-center">Statut</th>
                 </tr>
               </thead>
               <tbody>
