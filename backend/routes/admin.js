@@ -4,8 +4,8 @@ const admin = require("../controllers/adminController");
 
 router.post("/addgame", admin.addGame);
 router.post("/deletegame", admin.deleteGame);
-router.get("/getallusers", admin.getAllUsers);
-router.get("/getallfeedback", admin.getAllFeedback);
-router.get("/getallloans", admin.getAllLoans);
+router.get("/getallusers", admin.getUsers);
+router.get("/getallfeedback", admin.getFeedback);
+router.get("/getallloans", admin.getLoans);
 
 module.exports = router;
