@@ -124,7 +124,13 @@ module.exports.deleteUser = async (req, res) => {
 
   try {
     const db = await getConnection();
-    const [result] = await db.query('DELETE FROM users WHERE email = ?', [email]);
+    // Vérifie si l'utilisateur existe
+    const [existingUser] = await db.query('SELECT * FROM utilisateur WHERE email = ?', [email]);
+    if (existingUser.length === 0) {
+      return res.status(404).json({ success: false, message: "Utilisateur introuvable." });
+    }
+    // Supprime l'utilisateur
+    const [result] = await db.query('DELETE FROM utilisateur WHERE email = ?', [email]);
 
     if (result.affectedRows > 0) {
       res.json({ success: true, message: 'Utilisateur supprimé avec succès.' });
