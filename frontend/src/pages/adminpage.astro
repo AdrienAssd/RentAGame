@@ -66,6 +66,7 @@ import Layout from '../layouts/Layout.astro';
                   <th class="p-2 border text-center">Admin</th>
                   <th class="p-2 border text-center">Nb Emprunts</th>
                   <th class="p-2 border text-center">Nb Feedbacks</th>
+                  <th class="p-2 border text-center">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -76,6 +77,14 @@ import Layout from '../layouts/Layout.astro';
                     <td class="p-2 border text-center">${user.permission === 1 ? '✅' : '❌'}</td>
                     <td class="p-2 border text-center">${user.total_loans}</td>
                     <td class="p-2 border text-center">${user.total_feedbacks}</td>
+                    <td class="p-2 border text-center">
+                        <button 
+                        class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                        onclick="confirmDeleteUser('${user.email}')"
+                        >
+                        Supprimer
+                        </button>
+                    </td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -118,7 +127,29 @@ import Layout from '../layouts/Layout.astro';
         </section>
       `;
     }
+    window.confirmDeleteUser = async function(email) {
+        const confirmed = confirm(`Es-tu sûr de vouloir supprimer l'utilisateur ${email} ?`);
+        if (!confirmed) return;
 
+        try {
+            const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/admin/deleteuser/${encodeURIComponent(email)}`, {
+            method: 'DELETE',
+            credentials: 'include',
+            });
+
+            const data = await res.json();
+            if (data.success) {
+            alert("Utilisateur supprimé.");
+            location.reload(); // recharge la page pour refléter le changement
+            } else {
+            alert("Erreur : " + data.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Une erreur est survenue lors de la suppression.");
+        }
+    }
     init();
+    
   </script>
 </Layout>

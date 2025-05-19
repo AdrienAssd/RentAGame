@@ -108,3 +108,20 @@ module.exports.getLoans = async (req, res) => {
     res.status(500).json({ error: "Erreur serveur" });
   }
 }
+
+module.exports.deleteUser = async (req, res) => {
+  const email = req.params.email;
+
+  try {
+    const [result] = await db.query('DELETE FROM users WHERE email = ?', [email]);
+
+    if (result.affectedRows > 0) {
+      res.json({ success: true, message: 'Utilisateur supprimé avec succès.' });
+    } else {
+      res.status(404).json({ success: false, message: "Utilisateur introuvable." });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Erreur serveur." });
+  }
+}
