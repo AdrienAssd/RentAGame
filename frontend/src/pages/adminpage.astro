@@ -3,6 +3,20 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout>
+    <header class="flex justify-between items-center p-4 shadow bg-white">
+      <div class="flex items-center gap-2">
+        <img src="/images/LogoRentAGame.webp" alt="Logo" class="h-10">
+        <h1 class="text-xl font-bold">Page Admin</h1>
+      </div>
+      <nav class="space-x-4">
+        <a id="admin-page" href="/adminpage" class="font-medium hidden">Page Admin</a>
+        <a href="/" class="text-gray-600 hover:text-black">Liste des jeux</a>
+        <a id="loan-link" href="/loangames" class="text-gray-600 hover:text-black hidden">Mes emprunts</a>
+        <a href="/apropos" class="text-gray-600 hover:text-black">À propos</a>
+        <a href="/contact" class="text-gray-600 hover:text-black">Contact</a>
+        <a href="/login" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 hidden" id="login-btn">Connexion</a>
+      </nav>
+    </header>
   <h1 class="text-3xl font-bold text-center mb-6">Page Admin 👑</h1>
 
   <div id="admin-content" class="text-center">
@@ -57,7 +71,7 @@ import Layout from '../layouts/Layout.astro';
               <tbody>
                 ${users.map(user => `
                   <tr class="hover:bg-gray-50">
-                    <td class="p-2 border">${user.userame}</td>
+                    <td class="p-2 border">${user.username}</td>
                     <td class="p-2 border">${user.email}</td>
                     <td class="p-2 border text-center">${user.permission === 1 ? '✅' : '❌'}</td>
                     <td class="p-2 border text-center">${user.total_loans}</td>
