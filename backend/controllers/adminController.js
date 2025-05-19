@@ -42,6 +42,8 @@ module.exports.addGame = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
+  } finally {
+    db.end();
   }
 }
 
@@ -64,6 +66,8 @@ module.exports.deleteGame = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
+  } finally {
+    db.end();
   }
 }
 
@@ -78,6 +82,8 @@ module.exports.getUsers = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
+  } finally {
+    db.end();
   }
 }
 
@@ -92,6 +98,8 @@ module.exports.getFeedback = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
+  } finally {
+    db.end();
   }
 }
 
@@ -106,13 +114,16 @@ module.exports.getLoans = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
+  } finally {
+    db.end();
   }
 }
 
 module.exports.deleteUser = async (req, res) => {
-  const email = req.params.email;
+  const email = decodeURIComponent(req.params.email);
 
   try {
+    const db = await getConnection();
     const [result] = await db.query('DELETE FROM users WHERE email = ?', [email]);
 
     if (result.affectedRows > 0) {
@@ -123,5 +134,7 @@ module.exports.deleteUser = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Erreur serveur." });
+  } finally {
+    db.end();
   }
 }
