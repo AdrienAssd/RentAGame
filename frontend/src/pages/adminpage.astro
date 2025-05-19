@@ -1,113 +1,110 @@
 ---
 import Layout from '../layouts/Layout.astro';
-
-let isAdmin = false;
-let users = [];
-let loans = [];
-// Vérification du profil
-const res = await fetch('https://rentagame-production-81ca.up.railway.app/api/profile', {
-    method: 'GET',
-    credentials: 'include',
-    headers: {
-        'Origin': 'https://rent-a-game-lac.vercel.app',
-    },
-});
-
-const profile = await res.json();
-if (profile.loggedIn) {
-  isAdmin = profile.isAdmin;
-}
-if (!isAdmin || !profile.loggedIn) {
-  return new Response(null, {
-    status: 302,
-    headers: {
-      Location: '/',
-    },
-  });
-}
-
-// Récupération des données si admin
-const [usersRes, loansRes] = await Promise.all([
-  fetch('https://rentagame-production-81ca.up.railway.app/api/admin/users', {
-    credentials: 'include',
-    headers: { 'Origin': 'https://rent-a-game-lac.vercel.app' },
-  }),
-  fetch('https://rentagame-production-81ca.up.railway.app/api/admin/loans', {
-    credentials: 'include',
-    headers: { 'Origin': 'https://rent-a-game-lac.vercel.app' },
-  }),
-]);
-
-if (usersRes.ok) {
-  users = await usersRes.json();
-}
-if (loansRes.ok) {
-  loans = await loansRes.json();
-}
 ---
 
 <Layout>
   <h1 class="text-3xl font-bold text-center mb-6">Page Admin 👑</h1>
 
-  <section class="mb-10">
-    <h2 class="text-xl font-semibold mb-4">👥 Liste des utilisateurs</h2>
-    <div class="overflow-x-auto">
-      <table class="min-w-full border border-gray-300">
-        <thead class="bg-gray-100 text-left">
-          <tr>
-            <th class="p-2 border">Nom</th>
-            <th class="p-2 border">Email</th>
-            <th class="p-2 border">Admin</th>
-            <th class="p-2 border">Nb Emprunts</th>
-            <th class="p-2 border">Nb Feedbacks</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user: any) => (
-            <tr class="hover:bg-gray-50">
-              <td class="p-2 border">{user.name}</td>
-              <td class="p-2 border">{user.email}</td>
-              <td class="p-2 border text-center">{user.isAdmin ? '✅' : '❌'}</td>
-              <td class="p-2 border text-center">{user.total_loans}</td>
-              <td class="p-2 border text-center">{user.total_feedbacks}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </section>
+  <div id="admin-content" class="text-center">
+    <p>Chargement en cours...</p>
+  </div>
 
-  <section class="mb-10">
-    <h2 class="text-xl font-semibold mb-4">📚 Emprunts en cours</h2>
-    <div class="overflow-x-auto">
-      <table class="min-w-full border border-gray-300">
-        <thead class="bg-gray-100 text-left">
-          <tr>
-            <th class="p-2 border">Nom de l'utilisateur</th>
-            <th class="p-2 border">Nom du jeu</th>
-            <th class="p-2 border">Date d'emprunt</th>
-            <th class="p-2 border">Date de retour</th>
-            <th class="p-2 border">Statut</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loans.map((loan: any) => (
-            <tr class="hover:bg-gray-50">
-              <td class="p-2 border">{loan.username}</td>
-              <td class="p-2 border">{loan.primary_key}</td>
-              <td class="p-2 border">{loan.date?.split('T')[0]}</td>
-              <td class="p-2 border">{loan.date1?.split('T')[0]}</td>
-              <td class="p-2 border text-center">{loan.statut}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </section>
+  <script type="module">
+    const container = document.getElementById('admin-content');
 
-  <section class="text-center">
-    <a href="/add-game" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded shadow">
-      ➕ Ajouter un jeu
-    </a>
-  </section>
+    async function fetchProfile() {
+      const res = await fetch('https://rentagame-production-81ca.up.railway.app/api/profile', {
+        credentials: 'include',
+      });
+      return await res.json();
+    }
+
+    async function fetchAdminData() {
+      const [usersRes, loansRes] = await Promise.all([
+        fetch('https://rentagame-production-81ca.up.railway.app/api/admin/users', {
+          credentials: 'include',
+        }),
+        fetch('https://rentagame-production-81ca.up.railway.app/api/admin/loans', {
+          credentials: 'include',
+        }),
+      ]);
+      return [await usersRes.json(), await loansRes.json()];
+    }
+
+    async function init() {
+      const profile = await fetchProfile();
+      if (!profile.loggedIn || !profile.isAdmin) {
+        window.location.href = '/';
+        return;
+      }
+
+      const [users, loans] = await fetchAdminData();
+
+      container.innerHTML = `
+        <section class="mb-10">
+          <h2 class="text-xl font-semibold mb-4">👥 Liste des utilisateurs</h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full border border-gray-300">
+              <thead class="bg-gray-100 text-left">
+                <tr>
+                  <th class="p-2 border">Nom</th>
+                  <th class="p-2 border">Email</th>
+                  <th class="p-2 border">Admin</th>
+                  <th class="p-2 border">Nb Emprunts</th>
+                  <th class="p-2 border">Nb Feedbacks</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${users.map(user => `
+                  <tr class="hover:bg-gray-50">
+                    <td class="p-2 border">${user.name}</td>
+                    <td class="p-2 border">${user.email}</td>
+                    <td class="p-2 border text-center">${user.isAdmin ? '✅' : '❌'}</td>
+                    <td class="p-2 border text-center">${user.total_loans}</td>
+                    <td class="p-2 border text-center">${user.total_feedbacks}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="mb-10">
+          <h2 class="text-xl font-semibold mb-4">📚 Emprunts en cours</h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full border border-gray-300">
+              <thead class="bg-gray-100 text-left">
+                <tr>
+                  <th class="p-2 border">Nom de l'utilisateur</th>
+                  <th class="p-2 border">Nom du jeu</th>
+                  <th class="p-2 border">Date d'emprunt</th>
+                  <th class="p-2 border">Date de retour</th>
+                  <th class="p-2 border">Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${loans.map(loan => `
+                  <tr class="hover:bg-gray-50">
+                    <td class="p-2 border">${loan.username}</td>
+                    <td class="p-2 border">${loan.primary_key}</td>
+                    <td class="p-2 border">${loan.date?.split('T')[0]}</td>
+                    <td class="p-2 border">${loan.date1?.split('T')[0]}</td>
+                    <td class="p-2 border text-center">${loan.statut}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="text-center">
+          <a href="/add-game" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded shadow">
+            ➕ Ajouter un jeu
+          </a>
+        </section>
+      `;
+    }
+
+    init();
+  </script>
 </Layout>
