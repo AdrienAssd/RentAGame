@@ -21,10 +21,10 @@ import Layout from '../layouts/Layout.astro';
 
     async function fetchAdminData() {
       const [usersRes, loansRes] = await Promise.all([
-        fetch('https://rentagame-production-81ca.up.railway.app/api/admin/users', {
+        fetch('https://rentagame-production-81ca.up.railway.app/api/getallusers', {
           credentials: 'include',
         }),
-        fetch('https://rentagame-production-81ca.up.railway.app/api/admin/loans', {
+        fetch('https://rentagame-production-81ca.up.railway.app/api/getallloans', {
           credentials: 'include',
         }),
       ]);
