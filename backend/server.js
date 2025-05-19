@@ -5,6 +5,7 @@ const cors = require('cors');
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/auth");
 const gameRoutes = require("./routes/games");
+const adminRoutes = require("./routes/admin");
 require("dotenv").config();
 
 
@@ -33,6 +34,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use("/api", authRoutes);
 app.use("/api", gameRoutes);
+app.use("/api", adminRoutes);
 
 
 app.listen(port, () => {

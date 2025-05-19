@@ -93,7 +93,7 @@ exports.getProfile = async (req, res) => {
     const [userRows] = await db.execute('SELECT * FROM utilisateur WHERE email = ?', [email]);
     const user = userRows[0];
     if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
-    res.json({ loggedIn: true, email: user.email, username: user.username });
+    res.json({ loggedIn: true, email: user.email, username: user.username, isAdmin : user.permission === 1 });
   } catch {
     res.clearCookie("token");
     res.json({ loggedIn: false });

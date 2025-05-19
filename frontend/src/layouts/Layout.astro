@@ -21,7 +21,7 @@
 		console.warn("Le bouton d'emprunt n'existe pas dans la page");
 		return;
 	}
-
+	
 	try {
 		const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/profile`, {
 			method: 'GET',
@@ -47,6 +47,31 @@
 			loginButton.classList.remove('hidden');
 		}
 
+	} catch (error) {
+		console.error('Erreur lors de la requête:', error);
+	}
+	const adminPage = document.getElementById('admin-page');
+	if (!adminPage) {
+		console.warn("Le lien de la page admin n'existe pas dans la page");
+		return;
+	}
+	try {
+		const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/profile`, {
+			method: 'GET',
+			credentials: 'include'
+		});
+		if (!res.ok) {
+			console.error('Erreur API:', res.status);
+			return;
+		}
+
+		const data = await res.json();
+
+		if (data.loggedIn && data.isAdmin) {
+			adminPage.classList.remove('hidden');
+		} else {
+			adminPage.classList.add('hidden');
+		}
 	} catch (error) {
 		console.error('Erreur lors de la requête:', error);
 	}
