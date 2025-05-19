@@ -132,7 +132,7 @@ import Layout from '../layouts/Layout.astro';
         if (!confirmed) return;
 
         try {
-            const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/admin/deleteuser/${encodeURIComponent(email)}`, {
+            const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/deleteuser/${encodeURIComponent(email)}`, {
             method: 'DELETE',
             credentials: 'include',
             });
