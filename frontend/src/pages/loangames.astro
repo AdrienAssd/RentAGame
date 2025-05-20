@@ -43,7 +43,7 @@ const loanlist = await responseLoans.json();
 
             try {
                 const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/returnloan/${loanId}`, {
-                    method: 'DELETE',
+                    method: 'POST',
                     credentials: 'include',
                     headers: {
                         'Origin': 'https://rent-a-game-lac.vercel.app',
