@@ -32,6 +32,12 @@ import Layout from '../layouts/Layout.astro';
       });
       return await res.json();
     }
+    async function fetchStats() {
+      const res = await fetch('https://rentagame-production-81ca.up.railway.app/api/getstats', {
+        credentials: 'include',
+      });
+      return await res.json();
+    }
 
     async function fetchAdminData() {
       const [usersRes, loansRes, feedbacksRes] = await Promise.all([
@@ -56,8 +62,24 @@ import Layout from '../layouts/Layout.astro';
       }
 
       const [users, loans, feedbacks] = await fetchAdminData();
+      const stats = await fetchStats();
 
       container.innerHTML = `
+        <section class="mb-8">
+          <h2 class="text-xl font-semibold mb-4">📊 Statistiques générales</h2>
+          <div class="flex flex-wrap justify-center gap-6 text-lg">
+            <div class="bg-gray-100 p-4 rounded shadow">
+              👥 Utilisateurs : <strong>${stats.users}</strong>
+            </div>
+            <div class="bg-gray-100 p-4 rounded shadow">
+              📚 Emprunts : <strong>${stats.loans}</strong>
+            </div>
+            <div class="bg-gray-100 p-4 rounded shadow">
+              💬 Feedbacks : <strong>${stats.feedbacks}</strong>
+            </div>
+          </div>
+        </section>
+
         <section class="mb-10">
           <h2 class="text-xl font-semibold mb-4">👥 Liste des utilisateurs</h2>
           <div class="overflow-x-auto">

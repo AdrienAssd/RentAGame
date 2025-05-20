@@ -167,3 +167,16 @@ module.exports.deleteLoan = async (req, res) => {
     res.status(500).json({ success: false, message: "Erreur serveur." });
   }
 }
+
+module.exports.getStats = async (req, res) => {
+  try {
+    const [[{ users }]] = await db.query('SELECT get_total_users() AS users');
+    const [[{ loans }]] = await db.query('SELECT get_total_loans() AS loans');
+    const [[{ feedbacks }]] = await db.query('SELECT get_total_feedbacks() AS feedbacks');
+
+    res.json({ users, loans, feedbacks });
+  } catch (err) {
+    console.error('Erreur dans /api/getstats:', err);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+};

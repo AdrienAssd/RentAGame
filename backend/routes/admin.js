@@ -10,5 +10,6 @@ router.get("/getallloans", admin.getLoans);
 router.delete("/deleteuser/:email", admin.deleteUser);
 router.delete("/deletefeedback/:id", admin.deleteFeedback);
 router.delete("/deleteloan/:id", admin.deleteLoan);
+router.get("/getstats", admin.getStats);
 
 module.exports = router;
