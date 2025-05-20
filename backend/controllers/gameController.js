@@ -431,7 +431,7 @@ module.exports.returnLoan = async (req, res) => {
     // Vérifier si l'utilisateur a un emprunt actif pour le jeu
     const [loanRows] = await db.execute(
       'SELECT * FROM loan WHERE ID = ? AND statut = "emprunté"',
-      [ID]
+      [id]
     );
 
     if (loanRows.length === 0) {
@@ -442,7 +442,7 @@ module.exports.returnLoan = async (req, res) => {
     // Mettre à jour le statut de l'emprunt
     await db.execute(
       'UPDATE loan SET statut = "rendu" WHERE ID = ? AND statut = "emprunté"',
-      [ID]
+      [id]
     );
     
     await db.commit();  
