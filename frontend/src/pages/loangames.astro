@@ -37,7 +37,12 @@ const loanlist = await responseLoans.json();
     </br>
     <div id="loan-container"></div>
     <script>
-        async function returnGame(loanId: number) {
+        declare global {
+            interface Window {
+                returnGame: (loanId: number) => void;
+            }
+        }
+        window.returnGame = async function (loanId): Promise<void> {
             const confirmation = confirm("Es-tu sûr de vouloir rendre ce jeu ?");
             if (!confirmation) return;
 
@@ -60,7 +65,7 @@ const loanlist = await responseLoans.json();
                 console.error("Erreur :", error);
                 alert("Impossible de contacter le serveur.");
             }
-        };
+        }
         window.addEventListener('DOMContentLoaded', async () => {
             const profileRes = await fetch(`https://rentagame-production-81ca.up.railway.app/api/profile`, {
                 credentials: 'include',
