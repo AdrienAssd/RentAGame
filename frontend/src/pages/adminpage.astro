@@ -83,7 +83,7 @@ import Layout from '../layouts/Layout.astro';
                     <td class="p-2 border text-center">
                         <button 
                         class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
-                        onclick="confirmDeleteUser('${user.email}')"
+                        onclick="confirmDeleteUser('${user.user_ID}')"
                         >
                         Supprimer
                         </button>
@@ -175,12 +175,12 @@ import Layout from '../layouts/Layout.astro';
         </section>
       `;
     }
-    window.confirmDeleteUser = async function(email) {
-        const confirmed = confirm(`Es-tu sûr de vouloir supprimer l'utilisateur ${email} ?`);
+    window.confirmDeleteUser = async function(id) {
+        const confirmed = confirm(`Es-tu sûr de vouloir supprimer l'utilisateur ${user.email} ?`);
         if (!confirmed) return;
 
         try {
-            const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/deleteuser/${encodeURIComponent(email)}`, {
+            const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/deleteuser/${id}`, {
             method: 'DELETE',
             credentials: 'include',
             });

@@ -110,17 +110,17 @@ module.exports.getLoans = async (req, res) => {
 }
 
 module.exports.deleteUser = async (req, res) => {
-  const email = decodeURIComponent(req.params.email);
+  const id = req.params.id;
 
   try {
     const db = await getConnection();
     // Vérifie si l'utilisateur existe
-    const [existingUser] = await db.query('SELECT * FROM utilisateur WHERE email = ?', [email]);
+    const [existingUser] = await db.query('SELECT * FROM utilisateur WHERE user_ID = ?', [id]);
     if (existingUser.length === 0) {
       return res.status(404).json({ success: false, message: "Utilisateur introuvable." });
     }
     // Supprime l'utilisateur
-    await db.query('CALL delete_user_and_loans(?)', [email]);
+    await db.query('CALL delete_user_and_loans(?)', [id]);
     res.json({ success: true, message: 'Utilisateur supprimé avec succès.' });
   } catch (err) {
     console.error(err);
