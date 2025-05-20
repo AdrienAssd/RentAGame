@@ -133,7 +133,7 @@ module.exports.deleteUser = async (req, res) => {
       await db.rollback();
       return res.status(404).json({ success: false, message: "Utilisateur introuvable." });
     }
-    db.commit();
+    await db.commit();
     res.json({ success: true, message: 'Utilisateur supprimé avec succès.' });
   } catch (err) {
     await db.rollback();
@@ -147,20 +147,25 @@ module.exports.deleteFeedback = async (req, res) => {
 
   try {
     const db = await getConnection();
+    await db.beginTransaction();
     // Vérifie si le feedback existe
-    const [existingFeedback] = await db.query('SELECT * FROM feedback WHERE id = ?', [id]);
+    const [existingFeedback] = await db.query('SELECT * FROM feedback WHERE feedback_ID = ?', [id]);
     if (existingFeedback.length === 0) {
+      await db.rollback();
       return res.status(404).json({ success: false, message: "Feedback introuvable." });
     }
     // Supprime le feedback
     const [result] = await db.query('DELETE FROM feedback WHERE feedback_ID = ?', [id]);
 
     if (result.affectedRows > 0) {
+      await db.commit();
       res.json({ success: true, message: 'Feedback supprimé avec succès.' });
     } else {
+      await db.rollback();
       res.status(404).json({ success: false, message: "Feedback introuvable." });
     }
   } catch (err) {
+    await db.rollback();
     console.error(err);
     res.status(500).json({ success: false, message: "Erreur serveur." });
   }
@@ -171,15 +176,19 @@ module.exports.deleteLoan = async (req, res) => {
 
   try {
     const db = await getConnection();
+    await db.beginTransaction();
     // Vérifie si le prêt existe
     const [existingLoan] = await db.query('SELECT * FROM loan WHERE id = ?', [id]);
     if (existingLoan.length === 0) {
+      await db.rollback();
       return res.status(404).json({ success: false, message: "Prêt introuvable." });
     }
     // Supprime le prêt
     await db.query('CALL SupprimerLocation(?)', [id]);
+    await db.commit();
     res.json({ success: true, message: 'Prêt supprimé avec succès.' });
   } catch (err) {
+    await db.rollback();
     console.error(err);
     res.status(500).json({ success: false, message: "Erreur serveur." });
   }
