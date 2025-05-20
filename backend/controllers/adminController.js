@@ -120,13 +120,51 @@ module.exports.deleteUser = async (req, res) => {
       return res.status(404).json({ success: false, message: "Utilisateur introuvable." });
     }
     // Supprime l'utilisateur
-    const [result] = await db.query('DELETE FROM utilisateur WHERE email = ?', [email]);
+    await db.query('CALL delete_user_and_loans(?)', [email]);
+    res.json({ success: true, message: 'Utilisateur supprimé avec succès.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Erreur serveur." });
+  }
+}
+
+module.exports.deleteFeedback = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const db = await getConnection();
+    // Vérifie si le feedback existe
+    const [existingFeedback] = await db.query('SELECT * FROM feedback WHERE id = ?', [id]);
+    if (existingFeedback.length === 0) {
+      return res.status(404).json({ success: false, message: "Feedback introuvable." });
+    }
+    // Supprime le feedback
+    const [result] = await db.query('DELETE FROM feedback WHERE id = ?', [id]);
 
     if (result.affectedRows > 0) {
-      res.json({ success: true, message: 'Utilisateur supprimé avec succès.' });
+      res.json({ success: true, message: 'Feedback supprimé avec succès.' });
     } else {
-      res.status(404).json({ success: false, message: "Utilisateur introuvable." });
+      res.status(404).json({ success: false, message: "Feedback introuvable." });
     }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Erreur serveur." });
+  }
+}
+
+module.exports.deleteLoan = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const db = await getConnection();
+    // Vérifie si le prêt existe
+    const [existingLoan] = await db.query('SELECT * FROM loan WHERE id = ?', [id]);
+    if (existingLoan.length === 0) {
+      return res.status(404).json({ success: false, message: "Prêt introuvable." });
+    }
+    // Supprime le prêt
+    await db.query('CALL SupprimerLocation(?)', [id]);
+    res.json({ success: true, message: 'Prêt supprimé avec succès.' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Erreur serveur." });

@@ -34,15 +34,18 @@ import Layout from '../layouts/Layout.astro';
     }
 
     async function fetchAdminData() {
-      const [usersRes, loansRes] = await Promise.all([
+      const [usersRes, loansRes, feedbacksRes] = await Promise.all([
         fetch('https://rentagame-production-81ca.up.railway.app/api/getallusers', {
           credentials: 'include',
         }),
         fetch('https://rentagame-production-81ca.up.railway.app/api/getallloans', {
           credentials: 'include',
         }),
+        fetch('https://rentagame-production-81ca.up.railway.app/api/getallfeedback', { // suppose cette route existe
+          credentials: 'include',
+        }),
       ]);
-      return [await usersRes.json(), await loansRes.json()];
+      return [await usersRes.json(), await loansRes.json(), await feedbacksRes.json()];
     }
 
     async function init() {
@@ -52,7 +55,7 @@ import Layout from '../layouts/Layout.astro';
         return;
       }
 
-      const [users, loans] = await fetchAdminData();
+      const [users, loans, feedbacks] = await fetchAdminData();
 
       container.innerHTML = `
         <section class="mb-10">
@@ -103,6 +106,7 @@ import Layout from '../layouts/Layout.astro';
                   <th class="p-2 border text-center">Date d'emprunt</th>
                   <th class="p-2 border text-center">Date de retour</th>
                   <th class="p-2 border text-center">Statut</th>
+                  <th class="p-2 border text-center">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -113,6 +117,50 @@ import Layout from '../layouts/Layout.astro';
                     <td class="p-2 border">${loan.date?.split('T')[0]}</td>
                     <td class="p-2 border">${loan.date1?.split('T')[0]}</td>
                     <td class="p-2 border text-center">${loan.statut}</td>
+                    <td class="p-2 border text-center">
+                      <button 
+                        class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                        onclick="confirmDeleteLoan(${loan.id})"
+                      >
+                        Supprimer
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="mb-10">
+          <h2 class="text-xl font-semibold mb-4">💬 Liste des feedbacks</h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full border border-gray-300">
+              <thead class="bg-gray-100 text-left">
+                <tr>
+                  <th class="p-2 border text-center">Utilisateur</th>
+                  <th class="p-2 border text-center">Jeu</th>
+                  <th class="p-2 border text-center">Commentaire</th>
+                  <th class="p-2 border text-center">Note</th>
+                  <th class="p-2 border text-center">Date</th>
+                  <th class="p-2 border text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${feedbacks.map(feedback => `
+                  <tr class="hover:bg-gray-50">
+                    <td class="p-2 border">${feedback.username}</td>
+                    <td class="p-2 border">${feedback.primary_key}</td>
+                    <td class="p-2 border">${feedback.description}</td>
+                    <td class="p-2 border text-center">${feedback.rating}</td>
+                    <td class="p-2 border text-center">${feedback.date_fb?.split('T')[0]}</td>
+                    <td class="p-2 border text-center">
+                      <button 
+                        class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                        onclick="confirmDeleteFeedback(${feedback.feedback_id})"
+                      >
+                        Supprimer
+                      </button>
+                    </td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -148,7 +196,52 @@ import Layout from '../layouts/Layout.astro';
             console.error(error);
             alert("Une erreur est survenue lors de la suppression.");
         }
-    }
+    };
+    window.confirmDeleteLoan = async function(id) {
+      const confirmed = confirm(`Es-tu sûr de vouloir supprimer l'emprunt #${id} ?`);
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/deleteloan/${id}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert("Emprunt supprimé.");
+          init(); // Recharge les données
+        } else {
+          alert("Erreur : " + data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Une erreur est survenue lors de la suppression.");
+      }
+    };
+
+    window.confirmDeleteFeedback = async function(id) {
+      const confirmed = confirm(`Es-tu sûr de vouloir supprimer le feedback #${id} ?`);
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/deletefeedback/${id}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert("Feedback supprimé.");
+          init(); // Recharge les données
+        } else {
+          alert("Erreur : " + data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Une erreur est survenue lors de la suppression.");
+      }
+    };
     init();
     
   </script>
