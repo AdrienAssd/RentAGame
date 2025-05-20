@@ -133,7 +133,7 @@ module.exports.deleteUser = async (req, res) => {
       await db.rollback();
       return res.status(404).json({ success: false, message: "Utilisateur introuvable." });
     }
-    
+    db.commit();
     res.json({ success: true, message: 'Utilisateur supprimé avec succès.' });
   } catch (err) {
     await db.rollback();
