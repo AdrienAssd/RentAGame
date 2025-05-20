@@ -382,6 +382,7 @@ module.exports.getLoans = async (req, res) => {
   }
   
   try {
+    await db.query('CALL purgeLoans()');
     // Récupérer les emprunts de l'utilisateur
     const [loans] = await db.execute(
       `SELECT * FROM view_loan_user WHERE user_ID = ? AND statut = "emprunté"`,

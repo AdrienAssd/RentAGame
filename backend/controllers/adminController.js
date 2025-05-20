@@ -18,33 +18,6 @@ function getValidThumbnail(thumbnail) {
     return thumbnail;
 }
 
-module.exports.addGame = async (req, res) => {
-  try {
-    const { num, name, description, thumbnail, categories, yearspublished, minplayers, maxplayers, playingtime, minplaytime, maxplaytime, minage } = req.body;
-    const db = await getConnection();
-
-    // Vérifie si le jeu existe déjà
-    const [existingGame] = await db.execute('SELECT * FROM details WHERE primary_key = ?', [name]);
-    if (existingGame.length > 0) {
-      return res.status(400).json({ error: "Le jeu existe déjà" });
-    }
-
-    // Ajoute le jeu
-    const validThumbnail = getValidThumbnail(thumbnail);
-    await db.execute('INSERT INTO details (num, primary_key, description, yearspublished, minplayers, maxplayers, playingtime, minplaytime, maxplaytime, minage, boardgamecategory) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [num, name, description, yearspublished, minplayers, maxplayers, playingtime, minplaytime, maxplaytime, minage, categories]);
-
-    // Récupère l'ID du jeu ajouté
-    const [newGame] = await db.execute('SELECT * FROM jeux WHERE name = ?', [name]);
-    const gameId = newGame[0].id;
-    await db.execute('INSERT INTO ratings (id, thumbnail) VALUES (?, ?)', [gameId, validThumbnail]);
-
-    res.status(201).json({ message: "Game added" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Erreur serveur" });
-  }
-}
-
 module.exports.deleteGame = async (req, res) => {
   try {
     const { name } = req.body;
@@ -98,6 +71,7 @@ module.exports.getFeedback = async (req, res) => {
 module.exports.getLoans = async (req, res) => {
   try {
     const db = await getConnection();
+    await db.query('CALL purgeLoans()');
     const [loans] = await db.execute('SELECT * FROM view_loan_admin');
     if (loans.length === 0) {
       return res.status(404).json({ error: "Aucun prêt trouvé" });
