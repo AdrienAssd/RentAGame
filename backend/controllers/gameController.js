@@ -93,7 +93,7 @@ module.exports.getGames = async (req, res) => {
       };
     });
 
-    await db.end();
+    await db.release();
     res.json(games); // Retourner les jeux filtrés
   } catch (error) {
     console.error(error);
@@ -144,7 +144,7 @@ module.exports.getGames = async (req, res) => {
         };
       });
   
-      await db.end();
+      await db.release();
   
       // Log les jeux avant de les envoyer à la réponse
   
@@ -190,7 +190,7 @@ module.exports.getGames = async (req, res) => {
         });
       });
   
-      await db.end();
+      await db.release();
       res.json([...categoriesSet]);
     } catch (error) {
       console.error(error);
@@ -210,7 +210,7 @@ module.exports.getGames = async (req, res) => {
       );
 
   
-      await db.end();
+      await db.release();
   
       res.json(feedbacks); // Retourner les feedbacks avec username
     } catch (error) {
@@ -259,7 +259,7 @@ module.exports.getGames = async (req, res) => {
       console.error(error);
       res.status(500).json({ message: "Erreur lors de l'ajout de l'avis" });
     } finally {
-      await db.end();
+      await db.release();
     }
   };
 
@@ -361,7 +361,7 @@ module.exports.addLoan = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Erreur lors de l'ajout de l'emprunt" });
   } finally {
-    await db.end();
+    await db.release();
   }
 };
 
@@ -399,7 +399,7 @@ module.exports.getLoans = async (req, res) => {
       statut: loan.statut,
     }));
 
-    await db.end();
+    await db.release();
     res.json(loansWithDetails); // Retourner les emprunts avec les détails du jeu
   } catch (error) {
     console.error(error);

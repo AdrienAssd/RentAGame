@@ -110,26 +110,42 @@ module.exports.getLoans = async (req, res) => {
 }
 
 module.exports.deleteUser = async (req, res) => {
-  const id = req.params.id;
+  const email = decodeURIComponent(req.params.email);
 
   try {
     const db = await getConnection();
+    await db.beginTransaction();
     // Vérifie si l'utilisateur existe
-    const [existingUser] = await db.query('SELECT * FROM utilisateur WHERE user_ID = ?', [id]);
+    const [existingUser] = await db.query('SELECT * FROM utilisateur WHERE email = ?', [email]);
     if (existingUser.length === 0) {
+      await db.rollback();
       return res.status(404).json({ success: false, message: "Utilisateur introuvable." });
     }
+    // Récupère l'ID de l'utilisateur
+    const user_ID = existingUser[0].user_ID;
+    // Supprime les feedbacks de l'utilisateur
+    await db.query('DELETE FROM feedback WHERE user_ID = ?', [user_ID]);
+    // Supprime les prêts de l'utilisateur
+    await db.query('DELETE FROM loan WHERE user_ID = ?', [user_ID]);
     // Supprime l'utilisateur
-    await db.query('CALL delete_user_and_loans(?)', [id]);
+    const [result] = await db.query('DELETE FROM utilisateur WHERE email = ?', [email]);
+    if (result.affectedRows === 0) {
+      await db.rollback();
+      return res.status(404).json({ success: false, message: "Utilisateur introuvable." });
+    }
+    
     res.json({ success: true, message: 'Utilisateur supprimé avec succès.' });
   } catch (err) {
+    await db.rollback();
     console.error(err);
     res.status(500).json({ success: false, message: "Erreur serveur." });
+  } finally {
+    db.release();
   }
 }
 
 module.exports.deleteFeedback = async (req, res) => {
-  const id = req.params.id;
+  const id = decodeURIComponent(req.params.id);
 
   try {
     const db = await getConnection();
@@ -153,7 +169,7 @@ module.exports.deleteFeedback = async (req, res) => {
 }
 
 module.exports.deleteLoan = async (req, res) => {
-  const id = req.params.id;
+  const id = decodeURIComponent(req.params.id);
 
   try {
     const db = await getConnection();
