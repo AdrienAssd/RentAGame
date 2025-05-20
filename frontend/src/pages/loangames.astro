@@ -87,6 +87,7 @@ const loanlist = await responseLoans.json();
             const loanContainer = document.getElementById('loan-container');
             if (loanlist.length > 0 && loanContainer) {
                 loanlist.forEach((loan: any) => {
+                    console.log(loan);
                     const loanCard = document.createElement('div');
                     loanCard.className = 'bg-white p-4 rounded shadow mb-4';
                     loanCard.innerHTML = `
