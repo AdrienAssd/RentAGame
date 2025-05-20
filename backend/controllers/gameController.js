@@ -406,3 +406,52 @@ module.exports.getLoans = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la récupération des emprunts." });
   }
 };
+
+module.exports.returnLoan = async (req, res) => {
+  const { id } = req.params; // Récupérer l'ID de l'emprunt depuis les paramètres de la requête
+  if (!id) return res.status(400).json({ message: "ID d'emprunt manquant" });
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ message: "Utilisateur non authentifié (pas de token)" });
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const userEmail = decoded.email;
+
+  const db = await getConnection();
+  await db.beginTransaction();
+  try {
+    const [userRows] = await db.execute('SELECT user_ID FROM utilisateur WHERE email = ?', [userEmail]);
+    if (userRows.length === 0) return res.status(404).json({ message: "Utilisateur introuvable" });
+
+    const userId = userRows[0].user_ID;
+
+    if (!userId) {
+      await db.rollback();
+      return res.status(401).json({ message: "Utilisateur non authentifié" });
+    }
+    // Vérifier si l'utilisateur a un emprunt actif pour le jeu
+    const [loanRows] = await db.execute(
+      'SELECT * FROM loan WHERE ID = ? AND statut = "emprunté"',
+      [ID]
+    );
+
+    if (loanRows.length === 0) {
+      await db.rollback();
+      return res.status(409).json({ message: "Aucun emprunt actif trouvé pour ce jeu" });
+    }
+
+    // Mettre à jour le statut de l'emprunt
+    await db.execute(
+      'UPDATE loan SET statut = "rendu" WHERE ID = ? AND statut = "emprunté"',
+      [ID]
+    );
+    
+    await db.commit();  
+    res.status(200).json({ message: "Emprunt retourné avec succès" });
+  } catch (error) {
+    await db.rollback();
+    console.error(error);
+    res.status(500).json({ message: "Erreur lors du retour de l'emprunt" });
+  } finally {
+    await db.end();
+  }
+};

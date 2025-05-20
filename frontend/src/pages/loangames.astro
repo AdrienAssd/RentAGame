@@ -37,6 +37,30 @@ const loanlist = await responseLoans.json();
     </br>
     <div id="loan-container"></div>
     <script>
+        async function returnGame(loanId: number) {
+            const confirmation = confirm("Es-tu sûr de vouloir rendre ce jeu ?");
+            if (!confirmation) return;
+
+            try {
+                const res = await fetch(`https://rentagame-production-81ca.up.railway.app/api/returnloan/${loanId}`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'Origin': 'https://rent-a-game-lac.vercel.app',
+                    }
+                });
+
+                if (res.ok) {
+                    alert("Jeu rendu avec succès !");
+                    window.location.reload();
+                } else {
+                    alert("Une erreur est survenue lors du retour du jeu.");
+                }
+            } catch (error) {
+                console.error("Erreur :", error);
+                alert("Impossible de contacter le serveur.");
+            }
+        };
         window.addEventListener('DOMContentLoaded', async () => {
             const profileRes = await fetch(`https://rentagame-production-81ca.up.railway.app/api/profile`, {
                 credentials: 'include',
@@ -67,6 +91,7 @@ const loanlist = await responseLoans.json();
                                 <a href="/game/${loan.title}" rel="noopener noreferrer" class="font-bold text-lg text-blue-600 hover:underline">${loan.title}</a>
                                 <p class="text-sm text-gray-600 mt-1">Emprunté le ${loan.startDate}</p>
                                 <p class="text-sm text-gray-600">Fin le ${loan.endDate}</p>
+                                <button class="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" onclick="returnGame(${loan.ID})">Rendre</button>
                             </div>
                         </div>
                     `;

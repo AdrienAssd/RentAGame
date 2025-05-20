@@ -12,5 +12,6 @@ router.post('/addfeedback', games.addFeedback);
 router.get('/game/:slug', games.getGameBySlug);
 router.post('/addloan', games.addLoan);
 router.get('/getloans', games.getLoans);
+router.post('/returnloan/:id', games.returnLoan);
 
 module.exports = router;
