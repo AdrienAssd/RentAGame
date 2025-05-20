@@ -359,7 +359,7 @@ module.exports.addLoan = async (req, res) => {
   } catch (error) {
     await db.rollback();
     console.error(error);
-    res.status(500).json({ message: "Erreur lors de l'ajout de l'emprunt" });
+    res.status(500).json({ message: "Vous ne pouvez pas emprunter plus de 5 jeux" });
   } finally {
     await db.end();
   }
