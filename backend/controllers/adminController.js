@@ -139,8 +139,6 @@ module.exports.deleteUser = async (req, res) => {
     await db.rollback();
     console.error(err);
     res.status(500).json({ success: false, message: "Erreur serveur." });
-  } finally {
-    db.release();
   }
 }
 
