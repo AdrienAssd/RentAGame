@@ -153,7 +153,7 @@ module.exports.deleteFeedback = async (req, res) => {
       return res.status(404).json({ success: false, message: "Feedback introuvable." });
     }
     // Supprime le feedback
-    const [result] = await db.query('DELETE FROM feedback WHERE id = ?', [id]);
+    const [result] = await db.query('DELETE FROM feedback WHERE feedback_ID = ?', [id]);
 
     if (result.affectedRows > 0) {
       res.json({ success: true, message: 'Feedback supprimé avec succès.' });
