@@ -97,7 +97,7 @@ const loanlist = await responseLoans.json();
                                 <a href="/game/${loan.title}" rel="noopener noreferrer" class="font-bold text-lg text-blue-600 hover:underline">${loan.title}</a>
                                 <p class="text-sm text-gray-600 mt-1">Emprunté le ${loan.startDate}</p>
                                 <p class="text-sm text-gray-600">Fin le ${loan.endDate}</p>
-                                <button class="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" onclick="returnGame(${loan.ID})">Rendre</button>
+                                <button class="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" onclick="returnGame(${loan.id})">Rendre</button>
                             </div>
                         </div>
                     `;
