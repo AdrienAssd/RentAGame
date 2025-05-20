@@ -62,7 +62,7 @@ import Layout from '../layouts/Layout.astro';
           <h2 class="text-xl font-semibold mb-4">👥 Liste des utilisateurs</h2>
           <div class="overflow-x-auto">
             <table class="min-w-full border border-gray-300">
-              <thead class="bg-gray-100 text-left">
+              <thead class="bg-gray-200 text-left">
                 <tr>
                   <th class="p-2 border text-center">Nom</th>
                   <th class="p-2 border text-center">Email</th>
@@ -74,7 +74,7 @@ import Layout from '../layouts/Layout.astro';
               </thead>
               <tbody>
                 ${users.map(user => `
-                  <tr class="hover:bg-gray-50">
+                  <tr class="bg-gray-100 hover:bg-gray-50">
                     <td class="p-2 border">${user.username}</td>
                     <td class="p-2 border">${user.email}</td>
                     <td class="p-2 border text-center">${user.permission === 1 ? '✅' : '❌'}</td>
@@ -99,7 +99,7 @@ import Layout from '../layouts/Layout.astro';
           <h2 class="text-xl font-semibold mb-4">📚 Liste des emprunts</h2>
           <div class="overflow-x-auto">
             <table class="min-w-full border border-gray-300">
-              <thead class="bg-gray-100 text-left">
+              <thead class="bg-gray-200 text-left">
                 <tr>
                   <th class="p-2 border text-center">Nom de l'utilisateur</th>
                   <th class="p-2 border text-center">Nom du jeu</th>
@@ -111,7 +111,7 @@ import Layout from '../layouts/Layout.astro';
               </thead>
               <tbody>
                 ${loans.map(loan => `
-                  <tr class="hover:bg-gray-50">
+                  <tr class="bg-gray-100 hover:bg-gray-50">
                     <td class="p-2 border">${loan.username}</td>
                     <td class="p-2 border">${loan.primary_key}</td>
                     <td class="p-2 border">${loan.date?.split('T')[0]}</td>
@@ -135,7 +135,7 @@ import Layout from '../layouts/Layout.astro';
           <h2 class="text-xl font-semibold mb-4">💬 Liste des feedbacks</h2>
           <div class="overflow-x-auto">
             <table class="min-w-full border border-gray-300">
-              <thead class="bg-gray-100 text-left">
+              <thead class="bg-gray-200 text-left">
                 <tr>
                   <th class="p-2 border text-center">Utilisateur</th>
                   <th class="p-2 border text-center">Jeu</th>
@@ -147,7 +147,7 @@ import Layout from '../layouts/Layout.astro';
               </thead>
               <tbody>
                 ${feedbacks.map(feedback => `
-                  <tr class="hover:bg-gray-50">
+                  <tr class="bg-gray-100 hover:bg-gray-50">
                     <td class="p-2 border">${feedback.username}</td>
                     <td class="p-2 border">${feedback.primary_key}</td>
                     <td class="p-2 border">${feedback.description}</td>
