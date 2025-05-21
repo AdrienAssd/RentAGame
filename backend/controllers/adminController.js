@@ -45,8 +45,8 @@ module.exports.deleteGame = async (req, res) => {
 }
 
 module.exports.getUsers = async (req, res) => {
+  const db = await getConnection();
   try {
-    const db = await getConnection();
     const [users] = await db.execute('SELECT * FROM view_users_admin');
     if (users.length === 0) {
       return res.status(404).json({ error: "Aucun utilisateur trouvé" });
@@ -63,8 +63,8 @@ module.exports.getUsers = async (req, res) => {
 }
 
 module.exports.getFeedback = async (req, res) => {
+  const db = await getConnection();
   try {
-    const db = await getConnection();
     const [feedback] = await db.execute('SELECT * FROM view_feedback_admin');
     if (feedback.length === 0) {
       return res.status(404).json({ error: "Aucun feedback trouvé" });
@@ -81,8 +81,8 @@ module.exports.getFeedback = async (req, res) => {
 }
 
 module.exports.getLoans = async (req, res) => {
+  const db = await getConnection();
   try {
-    const db = await getConnection();
     await db.query('CALL purgeLoans()');
     const [loans] = await db.execute('SELECT * FROM view_loan_admin');
     if (loans.length === 0) {
