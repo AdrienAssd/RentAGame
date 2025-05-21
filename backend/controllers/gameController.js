@@ -98,7 +98,7 @@ module.exports.getGames = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la récupération des jeux." });
   } finally {
     if (db) {
-      await db.end();
+      await db.release();
     }
   }
 };
@@ -155,7 +155,7 @@ module.exports.getGames = async (req, res) => {
       res.status(500).json({ message: "Erreur lors de la récupération des jeux." });
     } finally {
       if (db) {
-        await db.end();
+        await db.release();
       }
     }
   };
@@ -202,7 +202,7 @@ module.exports.getGames = async (req, res) => {
       res.status(500).json({ message: "Erreur lors de la récupération des catégories." });
     } finally {
       if (db) {
-        await db.end();
+        await db.release();
       }
     }
   };
@@ -225,7 +225,7 @@ module.exports.getGames = async (req, res) => {
       res.status(500).json({ message: "Erreur lors de la récupération des feedbacks." });
     } finally {
       if (db) {
-        await db.end();
+        await db.release();
       }
     }
   };
@@ -271,7 +271,7 @@ module.exports.getGames = async (req, res) => {
       res.status(500).json({ message: "Erreur lors de l'ajout de l'avis" });
     } finally {
       if (db) {
-        await db.end();
+        await db.release();
       }
     }
   };
@@ -327,7 +327,7 @@ module.exports.getGames = async (req, res) => {
     res.status(500).json({ message: 'Erreur lors de la récupération du jeu.' });
   } finally {
     if (db) {
-      db.end();
+      db.release();
     }
   }
 };
@@ -379,7 +379,7 @@ module.exports.addLoan = async (req, res) => {
     res.status(500).json({ message: "Vous ne pouvez pas emprunter plus de 5 jeux" });
   } finally {
     if (db) {
-      await db.end();
+      await db.release();
     }
   }
 };
@@ -425,7 +425,7 @@ module.exports.getLoans = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la récupération des emprunts." });
   } finally {
     if (db) {
-      await db.end();
+      await db.release();
     }
   }
 };
@@ -476,7 +476,7 @@ module.exports.returnLoan = async (req, res) => {
     res.status(500).json({ message: "Erreur lors du retour de l'emprunt" });
   } finally {
     if (db) {
-      await db.end();
+      await db.release();
     }
   }
 };
