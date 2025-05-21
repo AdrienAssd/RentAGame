@@ -76,6 +76,7 @@ module.exports.getGames = async (req, res) => {
           .split(',')
           .map(cat => cat.trim());
       }
+
       // Trouver le rating correspondant à chaque jeu
 
       // Retourner les jeux avec toutes les données nécessaires
@@ -92,14 +93,11 @@ module.exports.getGames = async (req, res) => {
       };
     });
 
+    await db.end();
     res.json(games); // Retourner les jeux filtrés
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erreur lors de la récupération des jeux." });
-  } finally {
-    if (db) {
-      await db.release();
-    }
   }
 };
 
@@ -146,6 +144,7 @@ module.exports.getGames = async (req, res) => {
         };
       });
   
+      await db.end();
   
       // Log les jeux avant de les envoyer à la réponse
   
@@ -153,10 +152,6 @@ module.exports.getGames = async (req, res) => {
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Erreur lors de la récupération des jeux." });
-    } finally {
-      if (db) {
-        await db.release();
-      }
     }
   };
 
@@ -195,15 +190,11 @@ module.exports.getGames = async (req, res) => {
         });
       });
   
-
+      await db.end();
       res.json([...categoriesSet]);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Erreur lors de la récupération des catégories." });
-    } finally {
-      if (db) {
-        await db.release();
-      }
     }
   };
   
@@ -219,14 +210,12 @@ module.exports.getGames = async (req, res) => {
       );
 
   
+      await db.end();
+  
       res.json(feedbacks); // Retourner les feedbacks avec username
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Erreur lors de la récupération des feedbacks." });
-    } finally {
-      if (db) {
-        await db.release();
-      }
     }
   };
   
@@ -270,9 +259,7 @@ module.exports.getGames = async (req, res) => {
       console.error(error);
       res.status(500).json({ message: "Erreur lors de l'ajout de l'avis" });
     } finally {
-      if (db) {
-        await db.release();
-      }
+      await db.end();
     }
   };
 
@@ -325,10 +312,6 @@ module.exports.getGames = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erreur lors de la récupération du jeu.' });
-  } finally {
-    if (db) {
-      db.release();
-    }
   }
 };
 
@@ -378,9 +361,7 @@ module.exports.addLoan = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Vous ne pouvez pas emprunter plus de 5 jeux" });
   } finally {
-    if (db) {
-      await db.release();
-    }
+    await db.end();
   }
 };
 
@@ -419,14 +400,11 @@ module.exports.getLoans = async (req, res) => {
       statut: loan.statut,
     }));
 
+    await db.end();
     res.json(loansWithDetails); // Retourner les emprunts avec les détails du jeu
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erreur lors de la récupération des emprunts." });
-  } finally {
-    if (db) {
-      await db.release();
-    }
   }
 };
 
@@ -475,8 +453,6 @@ module.exports.returnLoan = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Erreur lors du retour de l'emprunt" });
   } finally {
-    if (db) {
-      await db.release();
-    }
+    await db.end();
   }
 };
