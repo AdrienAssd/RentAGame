@@ -76,7 +76,6 @@ module.exports.getGames = async (req, res) => {
           .split(',')
           .map(cat => cat.trim());
       }
-
       // Trouver le rating correspondant à chaque jeu
 
       // Retourner les jeux avec toutes les données nécessaires
@@ -93,11 +92,12 @@ module.exports.getGames = async (req, res) => {
       };
     });
 
-    await db.end();
     res.json(games); // Retourner les jeux filtrés
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erreur lors de la récupération des jeux." });
+  } finally {
+    await db.end();
   }
 };
 
@@ -144,7 +144,6 @@ module.exports.getGames = async (req, res) => {
         };
       });
   
-      await db.end();
   
       // Log les jeux avant de les envoyer à la réponse
   
@@ -152,6 +151,8 @@ module.exports.getGames = async (req, res) => {
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Erreur lors de la récupération des jeux." });
+    } finally {
+      await db.end();
     }
   };
 
@@ -190,11 +191,13 @@ module.exports.getGames = async (req, res) => {
         });
       });
   
-      await db.end();
+
       res.json([...categoriesSet]);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Erreur lors de la récupération des catégories." });
+    } finally {
+      await db.end();
     }
   };
   
@@ -210,12 +213,12 @@ module.exports.getGames = async (req, res) => {
       );
 
   
-      await db.end();
-  
       res.json(feedbacks); // Retourner les feedbacks avec username
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Erreur lors de la récupération des feedbacks." });
+    } finally {
+      await db.end();
     }
   };
   
@@ -312,6 +315,10 @@ module.exports.getGames = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erreur lors de la récupération du jeu.' });
+  } finally {
+    if (db) {
+      db.release();
+    }
   }
 };
 
@@ -400,11 +407,12 @@ module.exports.getLoans = async (req, res) => {
       statut: loan.statut,
     }));
 
-    await db.end();
     res.json(loansWithDetails); // Retourner les emprunts avec les détails du jeu
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erreur lors de la récupération des emprunts." });
+  } finally {
+    await db.end();
   }
 };
 

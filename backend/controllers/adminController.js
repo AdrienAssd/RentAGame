@@ -37,6 +37,10 @@ module.exports.deleteGame = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
+  } finally {
+    if (db) {
+      db.release();
+    }
   }
 }
 
@@ -51,6 +55,10 @@ module.exports.getUsers = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
+  } finally {
+    if (db) {
+      db.release();
+    }
   }
 }
 
@@ -65,6 +73,10 @@ module.exports.getFeedback = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
+  } finally {
+    if (db) {
+      db.release();
+    }
   }
 }
 
@@ -80,6 +92,10 @@ module.exports.getLoans = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
+  } finally {
+    if (db) {
+      db.release();
+    }
   }
 }
 
@@ -113,6 +129,10 @@ module.exports.deleteUser = async (req, res) => {
     await db.rollback();
     console.error(err);
     res.status(500).json({ success: false, message: "Erreur serveur." });
+  } finally {
+    if (db) {
+      db.release();
+    }
   }
 }
 
@@ -142,6 +162,10 @@ module.exports.deleteFeedback = async (req, res) => {
     await db.rollback();
     console.error(err);
     res.status(500).json({ success: false, message: "Erreur serveur." });
+  } finally {
+    if (db) {
+      db.release();
+    }
   }
 }
 
@@ -165,6 +189,10 @@ module.exports.deleteLoan = async (req, res) => {
     await db.rollback();
     console.error(err);
     res.status(500).json({ success: false, message: "Erreur serveur." });
+  } finally {
+    if (db) {
+      db.release();
+    }
   }
 }
 
@@ -180,5 +208,9 @@ module.exports.getStats = async (req, res) => {
   } catch (err) {
     console.error('Erreur dans /api/getstats:', err);
     res.status(500).json({ error: 'Erreur serveur' });
+  } finally {
+    if (db) {
+      db.release();
+    }
   }
 };
