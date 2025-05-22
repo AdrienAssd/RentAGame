@@ -75,7 +75,12 @@ exports.login = async (req, res) => {
 
 exports.logout = (req, res) => {
     // On efface le cookie contenant le token JWT
-    res.clearCookie("token", { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // true en prod (ex : Vercel)
+      sameSite: 'None',
+      maxAge: 60 * 60 * 1000 // 1 heure
+    });
   
     // Réponse de succès
     res.json({ message: "Logged out" });
